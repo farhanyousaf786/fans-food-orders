@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "267118373830",
+    "project_id": "fans-food-stf",
+    "storage_bucket": "fans-food-stf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267118373830:android:1e13941e64d5bbc1fc60c7",
+        "android_client_info": {
+          "package_name": "com.example.fans_food_order"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk0dB043MPcJDKDqq_Uf-jJUuQK2mjXiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267118373830:android:92f8d9bd8f965312fc60c7",
+        "android_client_info": {
+          "package_name": "com.fansfood"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk0dB043MPcJDKDqq_Uf-jJUuQK2mjXiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
