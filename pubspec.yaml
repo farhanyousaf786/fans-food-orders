@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^2.0.5
 
   # UI and Icons
   cupertino_icons: ^1.0.8
