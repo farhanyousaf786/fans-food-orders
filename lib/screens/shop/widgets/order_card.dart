@@ -159,6 +159,21 @@ class OrderCard extends StatelessWidget {
     );
   }
 
+  IconData _getStatusIcon(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return Icons.access_time;
+      case OrderStatus.preparing:
+        return Icons.restaurant;
+      case OrderStatus.ready:
+        return Icons.delivery_dining;
+      case OrderStatus.delivered:
+        return Icons.check_circle;
+      case OrderStatus.cancelled:
+        return Icons.cancel;
+    }
+  }
+
   Widget _buildDeliveryInfo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,35 +217,52 @@ class OrderCard extends StatelessWidget {
           'Update Status:',
           style: Theme.of(context).textTheme.titleSmall,
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        PopupMenuButton<OrderStatus>(
+          onSelected: (OrderStatus status) {
+            if (status != order.status) {
+              onStatusUpdate(status);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _getStatusColor(order.status).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              ),
             ),
-          ),
-          child: DropdownButton<OrderStatus>(
-            value: order.status,
-            underline: const SizedBox(),
-            items: OrderStatus.values.map((status) {
-              return DropdownMenuItem(
-                value: status,
-                child: Text(
-                  status.name.toUpperCase(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _getStatusIcon(order.status),
+                  size: 18,
+                  color: _getStatusColor(order.status),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  order.status.name,
                   style: TextStyle(
-                    color: _getStatusColor(status),
+                    color: _getStatusColor(order.status),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-              );
-            }).toList(),
-            onChanged: (newStatus) {
-              if (newStatus != null && newStatus != order.status) {
-                onStatusUpdate(newStatus);
-              }
-            },
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: _getStatusColor(order.status),
+                ),
+              ],
+            ),
           ),
+          itemBuilder: (BuildContext context) => [
+            _buildStatusMenuItem(context, OrderStatus.pending, Icons.access_time, 'Pending'),
+            _buildStatusMenuItem(context, OrderStatus.preparing, Icons.restaurant, 'Preparing'),
+            _buildStatusMenuItem(context, OrderStatus.ready, Icons.delivery_dining, 'Ready'),
+            _buildStatusMenuItem(context, OrderStatus.delivered, Icons.check_circle, 'Delivered'),
+            _buildStatusMenuItem(context, OrderStatus.cancelled, Icons.cancel, 'Cancelled'),
+          ],
         ),
       ],
     );
@@ -275,5 +307,18 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.cancelled:
         return Colors.red;
     }
+  }
+
+  PopupMenuItem<OrderStatus> _buildStatusMenuItem(BuildContext context, OrderStatus status, IconData icon, String label) {
+    return PopupMenuItem<OrderStatus>(
+      value: status,
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: _getStatusColor(status)),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
+      ),
+    );
   }
 }
