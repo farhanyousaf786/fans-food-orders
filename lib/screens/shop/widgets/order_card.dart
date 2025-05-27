@@ -15,23 +15,30 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-          ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildOrderHeader(context),
             const SizedBox(height: 16),
-            _buildOrderItems(),
+            _buildOrderItems(context),
             const Divider(height: 24),
             _buildOrderTotal(context),
             if (order.seatInfo.isNotEmpty) ...[
@@ -54,30 +61,32 @@ class OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Order #${order.id.substring(0, min(order.id.length, 8))}',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ) ?? const TextStyle(fontWeight: FontWeight.bold),
+              'Order #${order.id.substring(0, min(order.id.length, 6))}',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ) ?? const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Text(
               'Created at: ${order.createdAt.toLocal().toString().split('.')[0]}',
-              style: Theme.of(context).textTheme.bodySmall ?? const TextStyle(fontSize: 12),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ) ?? TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline),
             ),
           ],
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: _getStatusColor(order.status).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
+            color: _getStatusColor(order.status).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
             order.status.name.toUpperCase(),
             style: TextStyle(
               color: _getStatusColor(order.status),
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontSize: 11,
             ),
           ),
         ),
@@ -85,7 +94,7 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderItems() {
+  Widget _buildOrderItems(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -97,18 +106,25 @@ class OrderCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item['name'] ?? 'Unknown Item',
-                      style: const TextStyle(fontSize: 15),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
+                      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'x${item['quantity'] ?? 1}',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ],
@@ -124,12 +140,18 @@ class OrderCard extends StatelessWidget {
       children: [
         Text(
           'Total:',
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ) ?? TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         Text(
           '\$${order.total.toStringAsFixed(2)}',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              ) ?? TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.primary,
               ),
         ),
@@ -143,9 +165,9 @@ class OrderCard extends StatelessWidget {
       children: [
         Text(
           'Delivery Information',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ) ?? const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Container(
@@ -159,12 +181,12 @@ class OrderCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildSeatInfoRow('Section', order.seatInfo['section'] ?? ''),
-              _buildSeatInfoRow('Row', order.seatInfo['row'] ?? ''),
-              _buildSeatInfoRow('Seat', order.seatInfo['seatNo'] ?? ''),
-              _buildSeatInfoRow('Roof', order.seatInfo['roofNo'] ?? ''),
+              _buildSeatInfoRow('Section', order.seatInfo['section'] ?? '', context),
+              _buildSeatInfoRow('Row', order.seatInfo['row'] ?? '', context),
+              _buildSeatInfoRow('Seat', order.seatInfo['seatNo'] ?? '', context),
+              _buildSeatInfoRow('Roof', order.seatInfo['roofNo'] ?? '', context),
               if (order.seatInfo['seatDetails'] != null)
-                _buildSeatInfoRow('Details', order.seatInfo['seatDetails']),
+                _buildSeatInfoRow('Details', order.seatInfo['seatDetails'], context),
             ],
           ),
         ),
@@ -214,7 +236,7 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSeatInfoRow(String label, String value) {
+  Widget _buildSeatInfoRow(String label, String value, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
@@ -222,14 +244,18 @@ class OrderCard extends StatelessWidget {
         children: [
           Text(
             '$label:',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 13,
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 13),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
