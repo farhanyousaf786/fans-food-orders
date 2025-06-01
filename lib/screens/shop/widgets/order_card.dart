@@ -1,4 +1,5 @@
 import 'dart:math' show min;
+import 'package:fans_food_order/screens/shop/widgets/created_at_info.dart';
 import 'package:fans_food_order/screens/shop/widgets/delivery_info_section.dart';
 import 'package:fans_food_order/screens/shop/widgets/user_info_section.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,12 @@ class _OrderCardState extends State<OrderCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderHeader(context),
+                CreatedAtInfo(createdAt: widget.order.createdAt),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 16, top: 16),
+                child: _buildOrderHeader(context),
+              ),
               if (_isExpanded) ...[
                 const SizedBox(height: 16),
                 _buildOrderItems(context),
@@ -78,31 +84,24 @@ class _OrderCardState extends State<OrderCard> {
     );
   }
 
-  Widget _buildOrderHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Order #${widget.order.id.substring(0, min(widget.order.id.length, 6))}',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Created: ${widget.order.createdAt.toLocal().toString().split('.')[0]}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-            ),
-            _buildStatusSection(context),
-          ],
-        ),
-        
-      ],
-    );
-  }
+Widget _buildOrderHeader(BuildContext context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Order #${widget.order.id.substring(0, min(widget.order.id.length, 6))}',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          _buildStatusSection(context),
+        ],
+      ),
+    ],
+  );
+}
+
 
   Widget _buildOrderItems(BuildContext context) {
     return Column(
@@ -215,25 +214,43 @@ class _OrderCardState extends State<OrderCard> {
 }
 
 
-  Widget _buildStatusSection(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+Widget _buildStatusSection(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Update Status:', style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          'Update Status:',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(width: 8),
         PopupMenuButton<OrderStatus>(
           onSelected: (status) => widget.onStatusUpdate(status),
+          padding: EdgeInsets.zero,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: _getStatusColor(widget.order.status).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
-                Icon(_getStatusIcon(widget.order.status), size: 18, color: _getStatusColor(widget.order.status)),
-                const SizedBox(width: 6),
-                Text(widget.order.status.name, style: TextStyle(color: _getStatusColor(widget.order.status))),
-                const Icon(Icons.arrow_drop_down),
+                Icon(
+                  _getStatusIcon(widget.order.status),
+                  size: 16,
+                  color: _getStatusColor(widget.order.status),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  widget.order.status.name,
+                  style: TextStyle(
+                    color: _getStatusColor(widget.order.status),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+                const Icon(Icons.arrow_drop_down, size: 20),
               ],
             ),
           ),
@@ -242,7 +259,11 @@ class _OrderCardState extends State<OrderCard> {
                     value: status,
                     child: Row(
                       children: [
-                        Icon(_getStatusIcon(status), size: 18, color: _getStatusColor(status)),
+                        Icon(
+                          _getStatusIcon(status),
+                          size: 18,
+                          color: _getStatusColor(status),
+                        ),
                         const SizedBox(width: 6),
                         Text(status.name),
                       ],
@@ -251,8 +272,10 @@ class _OrderCardState extends State<OrderCard> {
               .toList(),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildSeatInfoRow(String label, String value, BuildContext context) {
     return Padding(
