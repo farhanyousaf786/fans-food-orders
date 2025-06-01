@@ -36,23 +36,34 @@ class AuthProvider with ChangeNotifier {
         _userModel = UserModel.fromFirestore(doc);
         notifyListeners();
 
-        // If user is a shop owner, initialize FCM
         if (_userModel?.role == 'shopowner') {
-          // Get the shop ID for this owner
-          final shopQuery = await _firestore
-              .collection('shops')
-              .where('admins', arrayContains: uid)
-              .limit(1)
-              .get();
+          final stadiumsSnapshot = await _firestore.collection('stadiums').get();
 
-          if (shopQuery.docs.isNotEmpty) {
-            final shopId = shopQuery.docs.first.id;
-            await FirebaseService.initializeMessaging(shopId);
+          for (var stadiumDoc in stadiumsSnapshot.docs) {
+            final stadiumId = stadiumDoc.id;
+
+            final shopQuery = await _firestore
+                .collection('stadiums')
+                .doc(stadiumId)
+                .collection('shops')
+                .where('admins', arrayContains: uid)
+                .get();
+
+            for (var shopDoc in shopQuery.docs) {
+              final shopId = shopDoc.id;
+
+              await FirebaseService.initializeMessaging(
+                stadiumId: stadiumId,
+                shopId: shopId,
+              );
+
+              print('✅ Initialized FCM for shop: $shopId under stadium: $stadiumId');
+            }
           }
         }
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      print('❌ Error loading user data: $e');
     }
   }
 

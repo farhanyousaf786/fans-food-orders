@@ -8,12 +8,18 @@ import 'providers/theme_provider.dart';
 import 'screens/auth/sign_in_screen.dart';
 import 'screens/home/home_screen.dart';
 
+@pragma('vm:entry-point')
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase Core
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Initialize Firebase services (App Check and FCM)
   await FirebaseService.initialize();
+  
   runApp(const MyApp());
 }
 
