@@ -165,7 +165,7 @@ class OrderCard extends StatelessWidget {
         return Icons.access_time;
       case OrderStatus.preparing:
         return Icons.restaurant;
-      case OrderStatus.ready:
+      case OrderStatus.delivering:
         return Icons.delivery_dining;
       case OrderStatus.delivered:
         return Icons.check_circle;
@@ -259,7 +259,7 @@ class OrderCard extends StatelessWidget {
           itemBuilder: (BuildContext context) => [
             _buildStatusMenuItem(context, OrderStatus.pending, Icons.access_time, 'Pending'),
             _buildStatusMenuItem(context, OrderStatus.preparing, Icons.restaurant, 'Preparing'),
-            _buildStatusMenuItem(context, OrderStatus.ready, Icons.delivery_dining, 'Ready'),
+            _buildStatusMenuItem(context, OrderStatus.delivering, Icons.delivery_dining, 'Delivering'),
             _buildStatusMenuItem(context, OrderStatus.delivered, Icons.check_circle, 'Delivered'),
             _buildStatusMenuItem(context, OrderStatus.cancelled, Icons.cancel, 'Cancelled'),
           ],
@@ -300,7 +300,7 @@ class OrderCard extends StatelessWidget {
         return Colors.orange;
       case OrderStatus.preparing:
         return Colors.blue;
-      case OrderStatus.ready:
+      case OrderStatus.delivering:
         return Colors.green;
       case OrderStatus.delivered:
         return Colors.purple;

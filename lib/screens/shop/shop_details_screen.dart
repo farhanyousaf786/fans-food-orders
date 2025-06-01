@@ -22,7 +22,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> with SingleTicker
     null, // All
     OrderStatus.pending,
     OrderStatus.preparing,
-    OrderStatus.ready,
+    OrderStatus.delivering,
     OrderStatus.delivered,
     OrderStatus.cancelled,
   ];
@@ -61,7 +61,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> with SingleTicker
             Tab(text: 'All'),
             Tab(text: 'Pending'),
             Tab(text: 'Preparing'),
-            Tab(text: 'Ready'),
+            Tab(text: 'Delivering'),
             Tab(text: 'Delivered'),
             Tab(text: 'Cancelled'),
           ],
