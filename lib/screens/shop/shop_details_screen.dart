@@ -53,10 +53,15 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> with SingleTicker
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          isScrollable: false, // Ensures even spacing and removes weird padding
+          isScrollable: true,
           labelColor: Theme.of(context).colorScheme.primary,
           unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
           indicatorColor: Theme.of(context).colorScheme.primary,
+          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
+          padding: EdgeInsets.zero,
+          indicatorPadding: EdgeInsets.zero,
+          tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(text: 'All'),
             Tab(text: 'Pending'),
