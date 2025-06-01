@@ -16,6 +16,7 @@ class OrderModel extends Equatable {
   final OrderStatus status;
   final DateTime createdAt;
   final Map<String, dynamic> seatInfo;
+  final Map<String, bool>? foodType;
 
   const OrderModel({
     required this.id,
@@ -31,6 +32,7 @@ class OrderModel extends Equatable {
     required this.status,
     required this.createdAt,
     required this.seatInfo,
+    this.foodType,
   });
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
@@ -49,6 +51,7 @@ class OrderModel extends Equatable {
       status: OrderStatus.values[data['status'] ?? 0],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       seatInfo: Map<String, dynamic>.from(data['seatInfo'] ?? {}),
+      foodType: data['foodType'] != null ? Map<String, bool>.from(data['foodType']) : null,
     );
   }
 
@@ -66,6 +69,7 @@ class OrderModel extends Equatable {
       'status': status.index,
       'createdAt': createdAt,
       'seatInfo': seatInfo,
+      'foodType': foodType,
     };
   }
 
@@ -84,5 +88,6 @@ class OrderModel extends Equatable {
         status,
         createdAt,
         seatInfo,
-      ];
+        foodType,
+        ];
 }
