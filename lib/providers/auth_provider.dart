@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
+import '../services/firebase_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -33,6 +35,21 @@ class AuthProvider with ChangeNotifier {
       if (doc.exists) {
         _userModel = UserModel.fromFirestore(doc);
         notifyListeners();
+
+        // If user is a shop owner, initialize FCM
+        if (_userModel?.role == 'shopowner') {
+          // Get the shop ID for this owner
+          final shopQuery = await _firestore
+              .collection('shops')
+              .where('admins', arrayContains: uid)
+              .limit(1)
+              .get();
+
+          if (shopQuery.docs.isNotEmpty) {
+            final shopId = shopQuery.docs.first.id;
+            await FirebaseService.initializeMessaging(shopId);
+          }
+        }
       }
     } catch (e) {
       print('Error loading user data: $e');
