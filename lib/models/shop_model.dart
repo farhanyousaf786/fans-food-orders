@@ -11,6 +11,8 @@ class ShopModel {
   final List<String> admins;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final double? latitude;
+  final double? longitude;
 
   ShopModel({
     required this.id,
@@ -23,7 +25,25 @@ class ShopModel {
     required this.admins,
     required this.createdAt,
     required this.updatedAt,
+    this.latitude,
+    this.longitude,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'location': location,
+      'floor': floor,
+      'gate': gate,
+      'stadiumId': stadiumId,
+      'admins': admins,
+      'latitude': latitude,
+      'longitude': longitude,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
 
   factory ShopModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -36,6 +56,8 @@ class ShopModel {
       gate: data['gate'] ?? '',
       stadiumId: data['stadiumId'] ?? '',
       admins: List<String>.from(data['admins'] ?? []),
+      latitude: (data['latitude'] as num?)?.toDouble(),
+      longitude: (data['longitude'] as num?)?.toDouble(),
       createdAt: data['createdAt'] is Timestamp 
           ? (data['createdAt'] as Timestamp).toDate()
           : DateTime.parse(data['createdAt'] as String),

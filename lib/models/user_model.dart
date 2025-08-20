@@ -8,6 +8,7 @@ class UserModel {
   final String role;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final List<String> shopIds;
 
   UserModel({
     required this.id,
@@ -17,6 +18,7 @@ class UserModel {
     required this.role,
     required this.createdAt,
     required this.updatedAt,
+    this.shopIds = const [],
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -29,6 +31,7 @@ class UserModel {
       role: data['role'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      shopIds: List<String>.from(data['shopsId'] ?? []),
     );
   }
 
@@ -48,6 +51,7 @@ class UserModel {
     String? code,
     String? email,
     String? name,
+    List<String>? shopIds,
     String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -57,6 +61,7 @@ class UserModel {
       code: code ?? this.code,
       email: email ?? this.email,
       name: name ?? this.name,
+      shopIds: shopIds ?? this.shopIds,
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -84,8 +84,6 @@ class FirebaseService {
       _log('Updating FCM token for shop: $shopId');
 
       await _firestore
-          .collection('stadiums')
-          .doc(stadiumId)
           .collection('shops')
           .doc(shopId)
           .update({
@@ -113,6 +111,26 @@ class FirebaseService {
   static void _log(String message, {bool isError = false}) {
     if (_debugMode || isError) {
       print(isError ? '❌ [FCM Error] $message' : '📱 [FCM] $message');
+    }
+  }
+
+  /// Update shop's location (latitude and longitude)
+  static Future<bool> updateShopLocation({
+    required String shopId,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      await _firestore.collection('shops').doc(shopId).update({
+        'latitude': latitude,
+        'longitude': longitude,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      _log('Updated location for shop: $shopId to ($latitude, $longitude)');
+      return true;
+    } catch (e) {
+      _log('Error updating shop location: $e', isError: true);
+      return false;
     }
   }
 }
