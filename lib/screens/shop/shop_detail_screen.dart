@@ -1,17 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../models/shop_model.dart';
-import '../orders/orders_list_screen.dart';
 
-class ShopDetailScreen extends StatelessWidget {
+import '../../models/shop_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/firebase_service.dart';
+import '../orders/orders_list_screen.dart';
+import 'widgets/shop_header_widget.dart';
+import 'widgets/location_info_card.dart';
+import 'widgets/stadium_info_card.dart';
+import 'widgets/action_buttons_widget.dart';
+
+class ShopDetailScreen extends StatefulWidget {
   final ShopModel shop;
 
   const ShopDetailScreen({super.key, required this.shop});
 
   @override
+  State<ShopDetailScreen> createState() => _ShopDetailScreenState();
+}
+
+class _ShopDetailScreenState extends State<ShopDetailScreen> {
+  bool _isUpdatingLocation = false;
+
+  Future<void> _updateLocation() async {
+    try {
+      // Request location permission
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Location services are disabled
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied');
+      }
+
+      setState(() {
+        _isUpdatingLocation = true;
+      });
+
+      // Get current location
+      final position = await Geolocator.getCurrentPosition();
+
+      // Update shop location in Firestore
+      final success = await FirebaseService.updateShopLocation(
+        shopId: widget.shop.id,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+
+      setState(() {
+        _isUpdatingLocation = false;
+      });
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Location updated to ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Refresh the shop data
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.loadUserData();
+      } else {
+        throw Exception('Failed to update location in database');
+      }
+    } catch (e) {
+      setState(() {
+        _isUpdatingLocation = false;
+      });
+
+      String errorMessage = 'Error updating location';
+      if (e is Exception) {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final shop = widget.shop;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(shop.name),
@@ -30,143 +120,56 @@ class ShopDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Shop Header
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.store,
-                            size: 32,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                shop.name,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                shop.description,
-                                style: theme.textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 32),
-                    _buildDetailRow(
-                      Icons.location_on,
-                      'Location',
-                      shop.location,
-                      theme,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildDetailRow(
-                            Icons.stairs,
-                            'Floor',
-                            shop.floor,
-                            theme,
-                          ),
-                        ),
-                        Expanded(
-                          child: _buildDetailRow(
-                            Icons.door_front_door,
-                            'Gate',
-                            shop.gate,
-                            theme,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            ShopHeader(shop: shop),
+
+            // Location Info Card
+            LocationInfoCard(
+              shop: shop,
+              isUpdating: _isUpdatingLocation,
             ),
-            
+
+            const SizedBox(height: 16),
+
+            // Stadium Info Card
+            StadiumInfoCard(shop: shop),
+
             const SizedBox(height: 24),
-            
-            // Additional Information Section
+
+            // Timestamps
             Text(
-              'Additional Information',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              'Timestamps',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    _buildInfoRow(
-                      'Shop ID',
-                      shop.id,
-                      theme,
-                    ),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Stadium ID',
-                      shop.stadiumId,
-                      theme,
-                    ),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Created',
-                      DateFormat('MMM d, y • h:mm a').format(shop.createdAt),
-                      theme,
-                    ),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Last Updated',
-                      DateFormat('MMM d, y • h:mm a').format(shop.updatedAt),
-                      theme,
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 8),
+            Text(
+              'Created: ${DateFormat('MMM d, y - h:mm a').format(shop.createdAt)}',
+              style: theme.textTheme.bodySmall,
             ),
-            
-            const SizedBox(height: 24),
-            
-            // Actions Section
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                    Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OrdersListScreen(shop: shop),
-                ),
-              );
-                },
-                icon: const Icon(Icons.shopping_bag),
-                label: const Text('View Orders'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
+            if (shop.updatedAt != null)
+              Text(
+                'Last Updated: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt!)}',
+                style: theme.textTheme.bodySmall,
               ),
+
+            const SizedBox(height: 32),
+
+            // Action Buttons
+            ActionButtons(
+              shop: shop,
+              isUpdating: _isUpdatingLocation,
+              onViewOrdersPressed: _isUpdatingLocation 
+                  ? null 
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrdersListScreen(shop: shop),
+                        ),
+                      );
+                    },
+              onUpdateLocationPressed: _isUpdatingLocation ? null : _updateLocation,
             ),
           ],
         ),
@@ -174,54 +177,4 @@ class ShopDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: theme.colorScheme.primary),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodySmall?.color,
-            ),
-          ),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/order_model.dart';
 import '../../models/shop_model.dart';
-import '../../providers/auth_provider.dart';
 import '../../models/order_status.dart';
+import 'widgets/status_update_dialog.dart';
 
 class OrdersListScreen extends StatelessWidget {
   final ShopModel shop;
@@ -14,7 +13,6 @@ class OrdersListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -135,6 +133,23 @@ class OrdersListScreen extends StatelessWidget {
                             ],
                           ),
                         ],
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                              onPressed: () async {
+                                await showStatusUpdateDialog(
+                                  context: context,
+                                  orderId: order.id,
+                                  currentStatus: order.status.index,
+                                  onStatusUpdated: (int newStatus) {
+                                    // The parent widget will handle the UI update through the stream
+                                  },
+                                );
+                              },
+                              child: const Text('UPDATE STATUS'),
+                            ),
+                          ),
                       ],
                     ),
                   ),

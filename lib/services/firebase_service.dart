@@ -133,4 +133,22 @@ class FirebaseService {
       return false;
     }
   }
+
+  /// Update order status in Firestore
+  static Future<bool> updateOrderStatus({
+    required String orderId,
+    required int newStatus,
+  }) async {
+    try {
+      await _firestore.collection('orders').doc(orderId).update({
+        'status': newStatus,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      _log('Updated order $orderId status to $newStatus');
+      return true;
+    } catch (e) {
+      _log('Error updating order status: $e', isError: true);
+      return false;
+    }
+  }
 }
