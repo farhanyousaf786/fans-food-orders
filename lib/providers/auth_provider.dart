@@ -53,6 +53,20 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Updates a single shop in the user's shops list
+  Future<void> updateShop(ShopModel updatedShop) async {
+    try {
+      final index = _userShops.indexWhere((shop) => shop.id == updatedShop.id);
+      if (index != -1) {
+        _userShops[index] = updatedShop;
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error updating shop: $e');
+      rethrow;
+    }
+  }
+
   Future<void> _loadUserData(String uid) async {
     try {
       print('🔍 Starting to load user data for UID: $uid');

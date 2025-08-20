@@ -29,7 +29,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       // Request location permission
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Location services are disabled
         throw Exception('Location services are disabled.');
       }
 
@@ -59,41 +58,49 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         longitude: position.longitude,
       );
 
-      setState(() {
-        _isUpdatingLocation = false;
-      });
+      if (success && mounted) {
+        // Create an updated shop object with the new location
+        final updatedShop = widget.shop.copyWith(
+          latitude: position.latitude,
+          longitude: position.longitude,
+          updatedAt: DateTime.now(),
+        );
 
-      if (success) {
+        // Update the shop in the auth provider
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.updateShop(updatedShop);
+
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Location updated to ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}'),
             duration: const Duration(seconds: 3),
           ),
         );
-
-        // Refresh the shop data
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        await authProvider.loadUserData();
-      } else {
+      } else if (!success) {
         throw Exception('Failed to update location in database');
       }
     } catch (e) {
-      setState(() {
-        _isUpdatingLocation = false;
-      });
-
       String errorMessage = 'Error updating location';
       if (e is Exception) {
         errorMessage = e.toString().replaceAll('Exception: ', '');
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          duration: const Duration(seconds: 5),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingLocation = false;
+        });
+      }
     }
   }
 
