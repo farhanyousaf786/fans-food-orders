@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../models/order_model.dart';
 import '../../../models/order_status.dart';
-import 'status_update_dialog.dart';
+import '../screens/order_details_screen.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -24,80 +26,92 @@ class OrderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Order #${order.orderId}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(order.status, theme).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    _formatStatus(order.status).toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: _getStatusColor(order.status, theme),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Order #${order.orderId}',
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _formatDate(order.createdAt),
-              style: theme.textTheme.bodySmall,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '${order.cart.length} items • ${_formatPrice(order.total)}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (order.seatInfo.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.chair,
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${order.seatInfo['section'] ?? 'Section'} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seat'] ?? ''}',
-                    style: theme.textTheme.bodySmall,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(order.status, theme).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _formatStatus(order.status).toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: _getStatusColor(order.status, theme),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ],
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () async {
-                  await showStatusUpdateDialog(
-                    context: context,
-                    orderId: order.id,
-                    currentStatus: order.status.index,
-                    onStatusUpdated: (int newStatus) {
-                      onStatusUpdated?.call();
-                    },
-                  );
-                },
-                child: const Text('UPDATE STATUS'),
+              const SizedBox(height: 8),
+              Text(
+                _formatDate(order.createdAt),
+                style: theme.textTheme.bodySmall,
               ),
-            ),
+              const SizedBox(height: 12),
+              Text(
+                '${order.cart.length} items • ${_formatPrice(order.total)}',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (order.seatInfo.isNotEmpty)
+                ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.chair,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${order.seatInfo['section'] ?? 'Section'} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seat'] ?? ''}',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderDetailsScreen(order: order),
+                          ),
+                        );
+                      },
+                      child: const Text('VIEW DETAILS'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        // TODO: Implement status update dialog
+                        onStatusUpdated?.call();
+                      },
+                      child: const Text('UPDATE STATUS'),
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -123,11 +137,13 @@ class OrderCard extends StatelessWidget {
     return status.toString().split('.').last.replaceAll('_', ' ');
   }
 
-  String _formatDate(DateTime dateTime) {
+  String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return 'N/A';
+    final dateTime = timestamp.toDate();
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   String _formatPrice(double amount) {
-    return '\$${amount.toStringAsFixed(2)}';
+    return '₪${amount.toStringAsFixed(2)}';
   }
 }

@@ -154,9 +154,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               'Created: ${DateFormat('MMM d, y - h:mm a').format(shop.createdAt)}',
               style: theme.textTheme.bodySmall,
             ),
-            if (shop.updatedAt != null)
-              Text(
-                'Last Updated: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt!)}',
+            Text(
+              'Last Updated: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt)}',
                 style: theme.textTheme.bodySmall,
               ),
 
