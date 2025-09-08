@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
 
@@ -25,7 +26,7 @@ class LocationInfoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Location Information',
+                  Translate.get('locationInformation'),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -41,15 +42,15 @@ class LocationInfoCard extends StatelessWidget {
             const SizedBox(height: 12),
             _buildInfoRow(
               Icons.location_on,
-              'Location',
-              '${shop.location} (${shop.floor} Floor, ${shop.gate} Gate)',
+              Translate.get('location'),
+              '${shop.location} (${shop.floor} ${Translate.get('floor')}, ${shop.gate} ${Translate.get('gate')})',
               theme,
             ),
             if (shop.latitude != null && shop.longitude != null) ...[
               const SizedBox(height: 8),
               _buildInfoRow(
                 Icons.my_location,
-                'Coordinates',
+                Translate.get('coordinates'),
                 '${shop.latitude!.toStringAsFixed(6)}, ${shop.longitude!.toStringAsFixed(6)}',
                 theme,
               ),

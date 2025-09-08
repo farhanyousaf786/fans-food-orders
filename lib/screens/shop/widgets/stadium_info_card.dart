@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
 
@@ -17,7 +18,7 @@ class StadiumInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Stadium Information',
+              Translate.get('stadiumInformation'),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -25,7 +26,7 @@ class StadiumInfoCard extends StatelessWidget {
             const SizedBox(height: 8),
             _buildInfoRow(
               Icons.stadium,
-              'Stadium ID',
+              Translate.get('stadiumId'),
               shop.stadiumId,
               theme,
             ),

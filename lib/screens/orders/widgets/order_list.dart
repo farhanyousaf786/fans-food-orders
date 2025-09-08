@@ -1,6 +1,9 @@
+import 'package:fans_food_order/translations/translate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../models/order_model.dart';
+
+
+import '../../../models/order.dart';
 import '../../../models/shop_model.dart';
 import '../../../models/order_status.dart';
 import 'order_card.dart';
@@ -19,11 +22,11 @@ class OrderList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: _getOrdersStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: Text('${Translate.get('error_prefix')}${snapshot.error}'));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -31,11 +34,11 @@ class OrderList extends StatelessWidget {
         }
 
         final orders = snapshot.data!.docs
-            .map((doc) => OrderModel.fromFirestore(doc))
+            .map((doc) => OrderModel.fromMap(doc.id, doc.data()))
             .toList();
 
         if (orders.isEmpty) {
-          return const Center(child: Text('No orders found'));
+          return Center(child: Text(Translate.get('noOrdersFound')));
         }
 
         return ListView.builder(
@@ -53,8 +56,8 @@ class OrderList extends StatelessWidget {
     );
   }
 
-  Stream<QuerySnapshot> _getOrdersStream() {
-    var query = FirebaseFirestore.instance
+  Stream<QuerySnapshot<Map<String, dynamic>>> _getOrdersStream() {
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance
         .collection('orders')
         .where('shopId', isEqualTo: shop.id)
         .orderBy('createdAt', descending: true);
@@ -66,3 +69,4 @@ class OrderList extends StatelessWidget {
     return query.snapshots();
   }
 }
+

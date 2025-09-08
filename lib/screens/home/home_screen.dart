@@ -1,3 +1,6 @@
+import 'package:fans_food_order/providers/language_provider.dart';
+import 'package:fans_food_order/translations/app_translations.dart';
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -23,10 +26,8 @@ class HomeScreen extends StatelessWidget {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 20),
-              Text(
-                'Loading your shops...',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text(Translate.get('loading_shops'),
+                  style: theme.textTheme.titleMedium),
             ],
           ),
         ),
@@ -41,28 +42,48 @@ class HomeScreen extends StatelessWidget {
     // Show shops list for shop owners
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Shops'),
+        title: Text(Translate.get('my_shops')),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => authProvider.loadUserData(),
-            tooltip: 'Refresh',
+            tooltip: Translate.get('refresh'),
           ),
+          _buildLanguageSwitcher(context),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _showLogoutConfirmation(context, authProvider),
-            tooltip: 'Sign Out',
+            tooltip: Translate.get('sign_out'),
           ),
         ],
       ),
       body: authProvider.userShops.isEmpty
-          ? _buildEmptyState(theme)
+          ? _buildEmptyState(theme, context)
           : _buildShopsList(authProvider.userShops, theme),
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildLanguageSwitcher(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    return PopupMenuButton<String>(
+      onSelected: (String languageCode) {
+        languageProvider.changeLanguage(Locale(languageCode));
+      },
+      itemBuilder: (BuildContext context) {
+        return AppTranslations.languageNames.keys.map((String code) {
+          return PopupMenuItem<String>(
+            value: code,
+            child: Text(AppTranslations.languageNames[code]!),
+          );
+        }).toList();
+      },
+      icon: const Icon(Icons.language),
+      tooltip: Translate.get('language'),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme, BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -74,14 +95,14 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Shops Found',
+            Translate.get('no_shops_found'),
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'You are not assigned to any shops yet.',
+            Translate.get('no_shops_assigned'),
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -105,9 +126,7 @@ class HomeScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -163,25 +182,21 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildDetailRow(
-                Icons.location_on,
-                shop.location,
-                theme,
-              ),
+              _buildDetailRow(Icons.location_on, shop.location, theme),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: _buildDetailRow(
                       Icons.stairs,
-                      'Floor: ${shop.floor}',
+                      '${Translate.get('floor')}: ${shop.floor}',
                       theme,
                     ),
                   ),
                   Expanded(
                     child: _buildDetailRow(
                       Icons.door_front_door,
-                      'Gate: ${shop.gate}',
+                      '${Translate.get('gate')}: ${shop.gate}',
                       theme,
                     ),
                   ),
@@ -189,7 +204,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Updated: ${DateFormat('MMM d, y • h:mm a').format(shop.updatedAt)}',
+                '${Translate.get('updated')}: ${DateFormat('MMM d, y • h:mm a').format(shop.updatedAt)}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 12,
                   color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
@@ -205,38 +220,36 @@ class HomeScreen extends StatelessWidget {
   Widget _buildDetailRow(IconData icon, String text, ThemeData theme) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(icon, size: 16, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(text, style: theme.textTheme.bodyMedium),
       ],
     );
   }
 
   void _showLogoutConfirmation(
-      BuildContext context, AuthProvider authProvider) {
+    BuildContext context,
+    AuthProvider authProvider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(Translate.get('sign_out')),
+        content: Text(Translate.get('sign_out_confirmation')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(Translate.get('cancel')),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               authProvider.signOut();
             },
-            child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+            child: Text(
+              Translate.get('sign_out'),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

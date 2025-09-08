@@ -1,18 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+
+
 // ignore: must_be_immutable
 class Food extends Equatable {
   final String id;
   final List<String> allergens;
   final String category;
+  final Map<String, String> categoryMap;
   final DateTime createdAt;
   final Map<String, dynamic> customization;
   final String description;
+  final Map<String, String> descriptionMap;
   final List<Map<String, dynamic>> extras;
   final List<String> images;
   final bool isAvailable;
   final String name;
+  final Map<String, String> nameMap;
   final Map<String, dynamic> nutritionalInfo;
   final int preparationTime;
   final double price;
@@ -24,19 +29,22 @@ class Food extends Equatable {
   final DateTime updatedAt;
   final Map<String, bool> foodType;
 
-  final int quantity;
+  int quantity = 1;
 
   Food({
     required this.id,
     required this.allergens,
     required this.category,
+    this.categoryMap = const {},
     required this.createdAt,
     required this.customization,
     required this.description,
+    this.descriptionMap = const {},
     required this.extras,
     required this.images,
     required this.isAvailable,
     required this.name,
+    this.nameMap = const {},
     required this.nutritionalInfo,
     required this.preparationTime,
     required this.price,
@@ -53,53 +61,59 @@ class Food extends Equatable {
   factory Food.fromMap(String id, Map<String, dynamic> map) {
     return Food(
       id: id,
-      allergens:
-          (map['allergens'] as List<dynamic>?)
+      allergens: (map['allergens'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       category: map['category'] ?? '',
+      categoryMap: (map['categoryMap'] as Map<String, dynamic>?)
+              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+          {},
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       customization: (map['customization'] as Map<String, dynamic>?) ?? {},
       description: map['description'] ?? '',
-      extras:
-          (map['extras'] as List<dynamic>?)
+      descriptionMap: (map['descriptionMap'] as Map<String, dynamic>?)
+              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+          {},
+      extras: (map['extras'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
-      images:
-          (map['images'] as List<dynamic>?)
+      images: (map['images'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       isAvailable: map['isAvailable'] ?? true,
       name: map['name'] ?? '',
+      nameMap: (map['nameMap'] as Map<String, dynamic>?)
+              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+          {},
       nutritionalInfo: (map['nutritionalInfo'] as Map<String, dynamic>?) ?? {},
       preparationTime: map['preparationTime'] ?? 15,
       price: (map['price'] ?? 0).toDouble(),
-      sauces:
-          (map['sauces'] as List<dynamic>?)
+      sauces: (map['sauces'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
       shopIds: List<String>.from(map['shopIds'] ?? []),
       stadiumId: map['stadiumId'] ?? '',
-      sizes:
-          (map['sizes'] as List<dynamic>?)
+      sizes: (map['sizes'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
-      toppings:
-          (map['toppings'] as List<dynamic>?)
+      toppings: (map['toppings'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
       updatedAt: (map['updatedAt'] as Timestamp).toDate(),
-      foodType:
-          (map['foodType'] as Map<String, dynamic>?)?.map(
+      foodType: (map['foodType'] as Map<String, dynamic>?)?.map(
             (key, value) => MapEntry(key, value as bool),
           ) ??
-          {'halal': false, 'kosher': false, 'vegan': false},
+          {
+            'halal': false,
+            'kosher': false,
+            'vegan': false,
+          },
       quantity: map['quantity'] ?? 0,
     );
   }
@@ -109,13 +123,15 @@ class Food extends Equatable {
       'id': id,
       'allergens': allergens,
       'category': category,
-      'createdAt': Timestamp.fromDate(createdAt),
+      'createdAt': createdAt,
       'customization': customization,
       'description': description,
+      'descriptionMap': descriptionMap,
       'extras': extras,
       'images': images,
       'isAvailable': isAvailable,
       'name': name,
+      'nameMap': nameMap,
       'nutritionalInfo': nutritionalInfo,
       'preparationTime': preparationTime,
       'price': price,
@@ -124,34 +140,32 @@ class Food extends Equatable {
       'stadiumId': stadiumId,
       'sizes': sizes,
       'toppings': toppings,
-      'updatedAt': Timestamp.fromDate(updatedAt),
+      'updatedAt': updatedAt,
       'foodType': foodType,
-      'quantity': quantity,
     };
   }
 
+
+
+  // Localization helpers
+  String nameFor(String languageCode) {
+    final value = nameMap[languageCode];
+    // if (value != null && value.trim().isNotEmpty) return value;
+    return value ??'';
+  }
+
+  String descriptionFor(String languageCode) {
+    final value = descriptionMap[languageCode];
+    // if (value != null && value.trim().isNotEmpty) return value;
+    return value ??'';
+  }
+
+  String categoryFor(String languageCode) {
+    final value = categoryMap[languageCode];
+    // if (value != null && value.trim().isNotEmpty) return value;
+    return value??'';
+  }
+
   @override
-  List<Object> get props => [
-        id,
-        allergens,
-        category,
-        createdAt,
-        customization,
-        description,
-        extras,
-        images,
-        isAvailable,
-        name,
-        nutritionalInfo,
-        preparationTime,
-        price,
-        sauces,
-        shopIds,
-        stadiumId,
-        sizes,
-        toppings,
-        updatedAt,
-        foodType,
-        quantity,
-      ];
+  List<Object> get props => [name, createdAt];
 }

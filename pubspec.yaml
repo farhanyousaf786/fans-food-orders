@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   equatable: ^2.0.5
 
   # UI and Icons
@@ -48,12 +50,15 @@ dependencies:
   firebase_storage: ^11.5.6
   firebase_messaging: ^14.7.9
   firebase_app_check: ^0.2.1+8
+
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   
   # Location
   geolocator: ^11.0.0
   flutter_local_notifications: ^19.2.1
 
-  intl: ^0.18.1
+  intl: ^0.20.2
   qr_flutter: ^4.1.0
 
 

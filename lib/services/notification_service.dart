@@ -1,10 +1,11 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  
+
   static final AndroidNotificationChannel _channel = AndroidNotificationChannel(
     'high_importance_channel',
     'High Importance Notifications',
@@ -15,21 +16,22 @@ class NotificationService {
   /// Initialize notification settings
   static Future<void> initialize() async {
     // Initialize Firebase Messaging
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
 
     // Initialize local notifications
     await _initializeLocalNotifications();
-    
+
     // Initialize background message handling
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    
+
     // Handle notification when app is in foreground
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    
+
     // Handle notification when app is in background and user taps on it
     FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
   }
@@ -39,9 +41,8 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
 
     await _notificationsPlugin.initialize(
       initializationSettings,
@@ -54,7 +55,8 @@ class NotificationService {
     // Create high importance notification channel
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_channel);
   }
 
@@ -65,11 +67,11 @@ class NotificationService {
 
     if (message.notification != null) {
       print('Message also contained a notification: ${message.notification}');
-      
+
       // Show local notification
       await _showNotification(
-        title: message.notification?.title ?? 'New Order',
-        body: message.notification?.body ?? 'You have a new order!',
+        title: message.notification?.title ?? Translate.get('new_order'),
+        body: message.notification?.body ?? Translate.get('you_have_new_order'),
         payload: message.data.toString(),
       );
     }

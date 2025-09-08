@@ -1,5 +1,7 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
-import '../../../models/order_model.dart';
+import '../../../models/order.dart';
+
 import '../../../models/order_status.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
@@ -13,7 +15,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order #${order.id}'),
+        title: Text('${Translate.get('order')} #${order.id}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -30,7 +32,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
             // Order Status Section
             Text(
-              'Status',
+              Translate.get('status'),
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
@@ -39,7 +41,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
             // Order Items Section
             Text(
-              'Items',
+              Translate.get('items'),
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
@@ -80,7 +82,7 @@ class OrderDetailsScreen extends StatelessWidget {
                           '₪${item.price.toStringAsFixed(2)}',
                           style: theme.textTheme.titleMedium,
                         ),
-                        Text('Qty: ${item.quantity}'),
+                        Text('${Translate.get('quantity')}: ${item.quantity}'),
                       ],
                     ),
                   ),
@@ -97,17 +99,59 @@ class OrderDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Order Summary',
+                      Translate.get('order_summary'),
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 10),
-                    _buildSummaryRow('Subtotal', '₪${order.subtotal.toStringAsFixed(2)}'),
+                    _buildSummaryRow(
+                        Translate.get('subtotal'), '₪${order.subtotal.toStringAsFixed(2)}'),
                     if (order.tipAmount > 0)
-                      _buildSummaryRow('Tip', '₪${order.tipAmount.toStringAsFixed(2)}'),
+                      _buildSummaryRow(Translate.get('tip'), '₪${order.tipAmount.toStringAsFixed(2)}'),
                     if (order.deliveryFee > 0)
-                      _buildSummaryRow('Handling & Delivery', '₪${order.deliveryFee.toStringAsFixed(2)}'),
-                    _buildSummaryRow('Total', '₪${order.total.toStringAsFixed(2)}',
+                      _buildSummaryRow(Translate.get('handlingAndDelivery'), '₪${order.deliveryFee.toStringAsFixed(2)}'),
+                    _buildSummaryRow(Translate.get('total'), '₪${order.total.toStringAsFixed(2)}',
                         isTotal: true),
+                  ],
+                ),
+              ),
+            ),
+
+            // Customer Information Section
+            const SizedBox(height: 20),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Translate.get('customer_information'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildDeliveryInfoRow(
+                          Icons.person,
+                          Translate.get('name'),
+                          (order.userInfo['userName'] ?? '-').toString(),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDeliveryInfoRow(
+                          Icons.phone,
+                          Translate.get('phone'),
+                          (order.userInfo['userPhoneNo'] ?? '-').toString(),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDeliveryInfoRow(
+                          Icons.email,
+                          Translate.get('email'),
+                          (order.userInfo['userEmail'] ?? '-').toString(),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -122,26 +166,33 @@ class OrderDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Delivery Information',
+                      Translate.get('delivery_information'),
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDeliveryInfoRow(Icons.area_chart, 'Area', order.seatInfo['area'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.area_chart, Translate.get('area'),
+                            order.seatInfo['area'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.door_front_door, 'Entrance', order.seatInfo['entrance'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.door_front_door,
+                            Translate.get('entrance'), order.seatInfo['entrance'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.view_stream, 'Row', order.seatInfo['row'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.view_stream, Translate.get('row'),
+                            order.seatInfo['row'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.event_seat, 'Seat No.', order.seatInfo['seatNo'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.event_seat, Translate.get('seat_no'),
+                            order.seatInfo['seatNo'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.details, 'Seat Details', order.seatInfo['seatDetails'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.details, Translate.get('seat_details'),
+                            order.seatInfo['seatDetails'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.grid_view, 'Section', order.seatInfo['section'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.grid_view, Translate.get('section'),
+                            order.seatInfo['section'] ?? '-'),
                         const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.stadium, 'Stand', order.seatInfo['stand'] ?? '-'),
+                        _buildDeliveryInfoRow(Icons.stadium, Translate.get('stand'),
+                            order.seatInfo['stand'] ?? '-'),
                       ],
                     ),
                   ],
@@ -172,7 +223,7 @@ class OrderDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            status.toString().split('.').last.toUpperCase(),
+            order.status.toTranslatedString(),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: statusColor,
               fontWeight: FontWeight.bold,

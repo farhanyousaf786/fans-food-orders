@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -72,13 +73,14 @@ class AuthProvider with ChangeNotifier {
       print('🔍 Starting to load user data for UID: $uid');
       _isLoading = true;
       notifyListeners();
-      
+
       // Get all shops where the user is an admin
       print('🔎 Querying shops collection for admin UID: $uid');
-      final shopsSnapshot = await _firestore
-          .collection('shops')
-          .where('admins', arrayContains: uid)
-          .get();
+      final shopsSnapshot =
+          await _firestore
+              .collection('shops')
+              .where('admins', arrayContains: uid)
+              .get();
 
       print('📊 Found ${shopsSnapshot.docs.length} shops for this user');
       if (shopsSnapshot.docs.isNotEmpty) {
@@ -88,9 +90,10 @@ class AuthProvider with ChangeNotifier {
         }
       }
 
-      _userShops = shopsSnapshot.docs
-          .map((doc) => ShopModel.fromFirestore(doc))
-          .toList();
+      _userShops =
+          shopsSnapshot.docs
+              .map((doc) => ShopModel.fromFirestore(doc))
+              .toList();
 
       print('🔄 Initializing FCM for ${_userShops.length} shops...');
       // Initialize FCM for each shop
@@ -112,45 +115,50 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('🔥 CRITICAL ERROR loading shops: $e');
-      print('Stack trace: ${e is Error ? (e as Error).stackTrace : 'No stack trace'}');
+      print(
+        'Stack trace: ${e is Error ? (e as Error).stackTrace : 'No stack trace'}',
+      );
       rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
+
   Future<void> _loadUserShops(String uid) async {
     try {
       _isLoading = true;
       _userShops = [];
       notifyListeners();
-      
+
       final stadiumsSnapshot = await _firestore.collection('stadiums').get();
-      
+
       for (var stadiumDoc in stadiumsSnapshot.docs) {
         final stadiumId = stadiumDoc.id;
-        
-        final shopQuery = await _firestore
-            .collection('stadiums')
-            .doc(stadiumId)
-            .collection('shops')
-            .where('admins', arrayContains: uid)
-            .get();
-            
+
+        final shopQuery =
+            await _firestore
+                .collection('stadiums')
+                .doc(stadiumId)
+                .collection('shops')
+                .where('admins', arrayContains: uid)
+                .get();
+
         for (var shopDoc in shopQuery.docs) {
           final shop = ShopModel.fromFirestore(shopDoc);
           _userShops.add(shop);
-          
+
           await FirebaseService.initializeMessaging(
             stadiumId: stadiumId,
             shopId: shop.id,
           );
-          
-          print('✅ Initialized FCM for shop: ${shop.id} under stadium: $stadiumId');
+
+          print(
+            '✅ Initialized FCM for shop: ${shop.id} under stadium: $stadiumId',
+          );
         }
       }
-      
+
       notifyListeners();
     } catch (e) {
       print('Error loading user shops: $e');
@@ -199,25 +207,23 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-
-
   String _handleAuthError(dynamic error) {
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'user-not-found':
-          return 'No user found with this email.';
+          return Translate.get('user_not_found');
         case 'wrong-password':
-          return 'Wrong password provided.';
+          return Translate.get('wrong_password');
         case 'email-already-in-use':
-          return 'Email is already registered.';
+          return Translate.get('email_already_in_use');
         case 'invalid-email':
-          return 'Invalid email address.';
+          return Translate.get('invalid_email');
         case 'weak-password':
-          return 'Password is too weak.';
+          return Translate.get('weak_password');
         default:
-          return 'Authentication failed. Please try again.';
+          return Translate.get('authentication_failed');
       }
     }
-    return 'An unexpected error occurred.';
+    return Translate.get('unexpected_error');
   }
 }

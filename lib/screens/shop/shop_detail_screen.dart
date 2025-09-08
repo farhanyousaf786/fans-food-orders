@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -29,19 +30,19 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       // Request location permission
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw Exception('Location services are disabled.');
+        throw Exception(Translate.get('location_services_disabled'));
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception('Location permissions are denied');
+          throw Exception(Translate.get('location_permissions_denied'));
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw Exception('Location permissions are permanently denied');
+        throw Exception(Translate.get('location_permissions_denied_forever'));
       }
 
       setState(() {
@@ -73,15 +74,16 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Location updated to ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}'),
+            content: Text(
+                '${Translate.get('location_updated_to')} ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}'),
             duration: const Duration(seconds: 3),
           ),
         );
       } else if (!success) {
-        throw Exception('Failed to update location in database');
+        throw Exception(Translate.get('failed_to_update_location'));
       }
     } catch (e) {
-      String errorMessage = 'Error updating location';
+      String errorMessage = Translate.get('error_updating_location');
       if (e is Exception) {
         errorMessage = e.toString().replaceAll('Exception: ', '');
       }
@@ -144,20 +146,20 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
             // Timestamps
             Text(
-              'Timestamps',
+              Translate.get('timestamps'),
               style: theme.textTheme.titleSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Created: ${DateFormat('MMM d, y - h:mm a').format(shop.createdAt)}',
+              '${Translate.get('created')}: ${DateFormat('MMM d, y - h:mm a').format(shop.createdAt)}',
               style: theme.textTheme.bodySmall,
             ),
             Text(
-              'Last Updated: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt)}',
-                style: theme.textTheme.bodySmall,
-              ),
+              '${Translate.get('last_updated')}: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt)}',
+              style: theme.textTheme.bodySmall,
+            ),
 
             const SizedBox(height: 32),
 
@@ -165,8 +167,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ActionButtons(
               shop: shop,
               isUpdating: _isUpdatingLocation,
-              onViewOrdersPressed: _isUpdatingLocation 
-                  ? null 
+              onViewOrdersPressed: _isUpdatingLocation
+                  ? null
                   : () {
                       Navigator.push(
                         context,
@@ -175,12 +177,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         ),
                       );
                     },
-              onUpdateLocationPressed: _isUpdatingLocation ? null : _updateLocation,
+              onUpdateLocationPressed:
+                  _isUpdatingLocation ? null : _updateLocation,
             ),
           ],
         ),
       ),
     );
   }
-
 }

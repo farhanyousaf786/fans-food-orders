@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+
 import 'food.dart';
 import 'order_status.dart';
+
+
 
 class OrderModel extends Equatable {
   final List<Food> cart;
@@ -24,10 +27,9 @@ class OrderModel extends Equatable {
   final GeoPoint? location;
   final GeoPoint? customerLocation;
 
-  final String? id;
+  final String id;
 
   OrderModel({
-    this.id,
     required this.cart,
     required this.subtotal,
     required this.deliveryFee,
@@ -47,21 +49,16 @@ class OrderModel extends Equatable {
     required this.orderCode,
     this.location,
     this.customerLocation,
+    required this.id,
   });
-
-  factory OrderModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return OrderModel.fromMap(doc.id, data);
-  }
 
   factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
     return OrderModel(
-      id: id,
       cart: List<Food>.from(
         map['cart']?.map(
-          (x) => Food.fromMap(x['id'] as String, x as Map<String, dynamic>),
+              (x) => Food.fromMap(x['id'] as String, x as Map<String, dynamic>),
         ) ??
-        [],
+            [],
       ),
       subtotal: (map['subtotal'] ?? 0) * 1.0,
       deliveryFee: (map['deliveryFee'] ?? 0) * 1.0,
@@ -81,12 +78,17 @@ class OrderModel extends Equatable {
       orderCode: map['orderCode'] ?? '',
       location: map['location'] as GeoPoint?,
       customerLocation: map['customerLocation'] as GeoPoint?,
+      id: id,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'cart': cart.map((x) => x.toMap()).toList(),
+      'cart': cart.map((x) {
+        var food = x.toMap();
+        food['quantity'] = x.quantity;
+        return food;
+      }).toList(),
       'subtotal': subtotal,
       'deliveryFee': deliveryFee,
       'discount': discount,
@@ -94,9 +96,11 @@ class OrderModel extends Equatable {
       'tipAmount': tipAmount,
       'isTipAdded': isTipAdded,
       'userInfo': userInfo,
+
       'stadiumId': stadiumId,
       'shopId': shopId,
       'orderId': orderId,
+      'id': id,
       'status': status.index,
       'createdAt': createdAt,
       'deliveryTime': deliveryTime,
@@ -124,7 +128,6 @@ class OrderModel extends Equatable {
     orderId,
     status,
     createdAt,
-    deliveryTime,
     seatInfo,
     deliveryUserId,
     orderCode,

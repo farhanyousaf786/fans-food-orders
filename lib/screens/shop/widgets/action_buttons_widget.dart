@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
 
@@ -25,7 +26,7 @@ class ActionButtons extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: isUpdating ? null : onViewOrdersPressed ?? () {},
             icon: const Icon(Icons.receipt_long),
-            label: const Text('View Orders'),
+            label: Text(Translate.get('viewOrders')),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -48,7 +49,7 @@ class ActionButtons extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.my_location_outlined),
-            label: Text(isUpdating ? 'Updating...' : 'Update Location'),
+            label: Text(isUpdating ? Translate.get('updating') : Translate.get('updateLocation')),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(

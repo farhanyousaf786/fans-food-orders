@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,12 +38,17 @@ class FirebaseService {
           _log('FCM token refreshed');
           _updateShopFCMToken(stadiumId, shopId, newToken);
         },
-        onError: (error) => _log('Error in token refresh: $error', isError: true),
+        onError:
+            (error) => _log('Error in token refresh: $error', isError: true),
       );
 
       FirebaseMessaging.onMessage.listen(
         _handleForegroundMessage,
-        onError: (error) => _log('Error handling foreground message: $error', isError: true),
+        onError:
+            (error) => _log(
+              'Error handling foreground message: $error',
+              isError: true,
+            ),
       );
 
       _log('✅ FCM initialized for shop: $shopId');
@@ -60,9 +66,9 @@ class FirebaseService {
         sound: true,
       );
 
-      _log('Notification permission status: ${settings.authorizationStatus}');
+      _log('${Translate.get('notification_permission_status')}: ${settings.authorizationStatus}');
     } catch (e, stackTrace) {
-      _log('❌ Error requesting permissions: $e\n$stackTrace', isError: true);
+      _log('❌ ${Translate.get('error_requesting_permissions')}: $e\n$stackTrace', isError: true);
       rethrow;
     }
   }
@@ -71,22 +77,23 @@ class FirebaseService {
     try {
       _log('Requesting FCM token...');
       final token = await _messaging.getToken();
-      _log(token != null ? '✅ Token: $token' : '⚠️ FCM token is null');
+      _log(token != null ? '✅ Token: $token' : '⚠️ ${Translate.get('fcm_token_is_null')}');
       return token;
     } catch (e, stackTrace) {
-      _log('❌ Error getting FCM token: $e\n$stackTrace', isError: true);
+      _log('❌ ${Translate.get('error_getting_fcm_token')}: $e\n$stackTrace', isError: true);
       return null;
     }
   }
 
-  static Future<void> _updateShopFCMToken(String stadiumId, String shopId, String token) async {
+  static Future<void> _updateShopFCMToken(
+    String stadiumId,
+    String shopId,
+    String token,
+  ) async {
     try {
       _log('Updating FCM token for shop: $shopId');
 
-      await _firestore
-          .collection('shops')
-          .doc(shopId)
-          .update({
+      await _firestore.collection('shops').doc(shopId).update({
         'shopUserFcmToken': token,
         'lastTokenUpdate': FieldValue.serverTimestamp(),
       });

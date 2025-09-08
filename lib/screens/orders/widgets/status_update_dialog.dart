@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/order_status.dart';
 import '../../../services/firebase_service.dart';
@@ -23,12 +24,12 @@ class StatusUpdateDialog extends StatelessWidget {
         .toList();
 
     return AlertDialog(
-      title: const Text('Update Order Status'),
+      title: Text(Translate.get('update_order_status_title')),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Select the new status for this order:'),
+          Text(Translate.get('select_new_status_prompt')),
           const SizedBox(height: 16),
           ...statuses.map((status) {
             final isCurrent = status.name == currentStatus;
@@ -39,7 +40,7 @@ class StatusUpdateDialog extends StatelessWidget {
                 onChanged: null, // Disable radio button selection
               ),
               title: Text(
-                status.name.toUpperCase(),
+                status.toTranslatedString().toUpperCase(),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: isCurrent ? theme.colorScheme.primary : null,
                   fontWeight: isCurrent ? FontWeight.bold : null,
@@ -51,17 +52,18 @@ class StatusUpdateDialog extends StatelessWidget {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Confirm Status Update'),
-                          content: Text(
-                              'Change order status to ${status.name.toUpperCase()}?'),
+                          title: Text(Translate.get('confirm_status_update_title')),
+                          content: Text(Translate.get('confirm_status_update_prompt')
+                              .replaceAll('{status}', status.toTranslatedString().toUpperCase())),
+
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('CANCEL'),
+                              child: Text(Translate.get('cancel').toUpperCase()),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('CONFIRM'),
+                              child: Text(Translate.get('confirm_button').toUpperCase()),
                             ),
                           ],
                         ),
@@ -79,15 +81,16 @@ class StatusUpdateDialog extends StatelessWidget {
                             onStatusUpdated(status.index);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                    'Order status updated to ${status.name}'),
+                                content: Text(Translate.get('order_status_updated_to')
+                                    .replaceAll('{status}', status.toTranslatedString())),
+
                                 backgroundColor: theme.colorScheme.primary,
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Failed to update order status'),
+                                content: Text(Translate.get('failed_to_update_order_status')),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -102,7 +105,7 @@ class StatusUpdateDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CLOSE'),
+          child: Text(Translate.get('close_button').toUpperCase()),
         ),
       ],
     );

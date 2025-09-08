@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../models/order_status.dart';
 import '../../models/shop_model.dart';
@@ -42,14 +43,14 @@ class _OrdersListScreenState extends State<OrdersListScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orders - ${widget.shop.name}'),
+        title: Text('${Translate.get('orders')} - ${widget.shop.name}'),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
           tabs: [
-            const Tab(text: 'ALL'),
+            Tab(text: Translate.get('all').toUpperCase()),
             ..._statusTabs.map((status) => Tab(
-                  text: status.toString().split('.').last.toUpperCase(),
+                  text: status.toTranslatedString().toUpperCase(),
                 )),
           ],
         ),

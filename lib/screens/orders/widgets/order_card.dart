@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../models/order_model.dart';
+import 'package:fans_food_order/translations/translate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:fans_food_order/screens/orders/widgets/status_update_dialog.dart';
+import 'package:flutter/material.dart';
+
+
+
+import '../../../models/order.dart';
 import '../../../models/order_status.dart';
 import '../screens/order_details_screen.dart';
 
@@ -30,7 +35,7 @@ class OrderCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Order #${order.orderId}',
+                    '${Translate.get('order_id_prefix')}${order.orderId}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -45,7 +50,7 @@ class OrderCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      _formatStatus(order.status).toUpperCase(),
+                      order.status.toTranslatedString().toUpperCase(),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: _getStatusColor(order.status, theme),
                         fontWeight: FontWeight.bold,
@@ -61,7 +66,7 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '${order.cart.length} items • ${_formatPrice(order.total)}',
+                '${Translate.get('items_count').replaceAll('{count}', order.cart.length.toString())} • ${_formatPrice(order.total)}',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -78,7 +83,7 @@ class OrderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${order.seatInfo['section'] ?? 'Section'} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seat'] ?? ''}',
+                        '${order.seatInfo['section'] ?? Translate.get('section')} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seatNo'] ?? ''}',
                         style: theme.textTheme.bodySmall,
                       ),
                     ],
@@ -97,17 +102,23 @@ class OrderCard extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text('VIEW DETAILS'),
+                      child: Text(Translate.get('view_details')),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () async {
-                        // TODO: Implement status update dialog
-                        onStatusUpdated?.call();
+                        await showStatusUpdateDialog(
+                          context: context,
+                          orderId: order.id??'',
+                          currentStatus: order.status.index,
+                          onStatusUpdated: (int newStatus) {
+                            onStatusUpdated?.call();
+                          },
+                        );
                       },
-                      child: const Text('UPDATE STATUS'),
+                      child: Text(Translate.get('update_status')),
                     ),
                   ),
                 ],
@@ -133,12 +144,9 @@ class OrderCard extends StatelessWidget {
     }
   }
 
-  String _formatStatus(OrderStatus status) {
-    return status.toString().split('.').last.replaceAll('_', ' ');
-  }
 
   String _formatDate(Timestamp? timestamp) {
-    if (timestamp == null) return 'N/A';
+    if (timestamp == null) return Translate.get('dateNotAvailable');
     final dateTime = timestamp.toDate();
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }

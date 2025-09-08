@@ -1,3 +1,4 @@
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -73,7 +74,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Welcome Back!',
+                  Translate.get('signInWelcome'),
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -84,7 +85,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    labelText: Translate.get('emailLabel'),
                     prefixIcon: const Icon(Icons.email),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -92,10 +93,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return Translate.get('emailRequiredError');
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return Translate.get('emailInvalidError');
                     }
                     return null;
                   },
@@ -107,7 +108,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: Translate.get('passwordLabel'),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -127,10 +128,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return Translate.get('passwordRequiredError');
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return Translate.get('passwordLengthError');
                     }
                     return null;
                   },
@@ -167,7 +168,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Sign In'),
+                          : Text(Translate.get('signInButton')),
                     );
                   },
                 ),
@@ -180,7 +181,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Theme:'),
+                        Text(Translate.get('themeLabel')),
                         const SizedBox(width: 8),
                         IconButton(
                           icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
