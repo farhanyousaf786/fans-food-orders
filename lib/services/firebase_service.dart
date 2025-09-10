@@ -2,12 +2,16 @@ import 'package:fans_food_order/translations/translate.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'notification_service.dart';
 
 class FirebaseService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const bool _debugMode = true;
+
+  static bool _isIOS() => defaultTargetPlatform == TargetPlatform.iOS;
 
   static Future<void> initialize() async {
     await FirebaseAppCheck.instance.activate(
@@ -76,9 +80,40 @@ class FirebaseService {
   static Future<String?> _getFCMToken() async {
     try {
       _log('Requesting FCM token...');
-      final token = await _messaging.getToken();
-      _log(token != null ? '✅ Token: $token' : '⚠️ ${Translate.get('fcm_token_is_null')}');
-      return token;
+
+      // On iOS Simulator, APNS token is not available; skip to avoid apns-token-not-set errors
+      if (_isIOS()) {
+        try {
+          final deviceInfo = DeviceInfoPlugin();
+          final ios = await deviceInfo.iosInfo;
+          if (ios.isPhysicalDevice != true) {
+            _log('Detected iOS Simulator; skipping FCM token request because APNS is unavailable.');
+            return null;
+          }
+        } catch (_) {
+          // If device info fails, continue gracefully and attempt token normally
+        }
+      }
+
+      // Try to get FCM token; if APNS not yet set on iOS device, retry once after short delay
+      try {
+        final token = await _messaging.getToken();
+        _log(token != null ? '✅ Token: $token' : '⚠️ ${Translate.get('fcm_token_is_null')}');
+        return token;
+      } catch (e) {
+        final message = e.toString();
+        final isApnsNotSet = message.contains('apns-token-not-set');
+        if (_isIOS() && isApnsNotSet) {
+          _log('APNS token not set yet. Waiting 3s and retrying...');
+          await Future<void>.delayed(const Duration(seconds: 3));
+          // Attempt to nudge APNS by querying it
+          try { await _messaging.getAPNSToken(); } catch (_) {}
+          final retry = await _messaging.getToken();
+          _log(retry != null ? '✅ Token (after retry): $retry' : '⚠️ ${Translate.get('fcm_token_is_null')} (after retry)');
+          return retry;
+        }
+        rethrow;
+      }
     } catch (e, stackTrace) {
       _log('❌ ${Translate.get('error_getting_fcm_token')}: $e\n$stackTrace', isError: true);
       return null;

@@ -58,6 +58,9 @@ dependencies:
   geolocator: ^11.0.0
   flutter_local_notifications: ^19.2.1
 
+  # Device info (used to detect iOS Simulator vs Physical Device)
+  device_info_plus: ^10.1.0
+
   intl: ^0.20.2
   qr_flutter: ^4.1.0
 
