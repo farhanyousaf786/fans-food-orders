@@ -43,13 +43,13 @@ dependencies:
   provider: ^6.1.1
   shared_preferences: ^2.2.2
 
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_storage: ^11.5.6
-  firebase_messaging: ^14.7.9
-  firebase_app_check: ^0.2.1+8
+  # Firebase - Updated to newer versions to resolve gRPC template parsing issues
+  firebase_core: ^3.1.0
+  firebase_auth: ^5.1.0
+  cloud_firestore: ^5.0.1
+  firebase_storage: ^12.0.1
+  firebase_messaging: ^15.0.1
+  firebase_app_check: ^0.3.0
 
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -59,6 +59,9 @@ dependencies:
   # Location
   geolocator: ^11.0.0
   flutter_local_notifications: ^19.2.1
+
+  # Device info (used to detect iOS Simulator vs Physical Device)
+  device_info_plus: ^10.1.0
 
   intl: ^0.20.2
   qr_flutter: ^4.1.0
