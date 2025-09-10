@@ -4,11 +4,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'services/firebase_service.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
+import 'bloc/order/order_bloc.dart';
 import 'screens/auth/sign_in_screen.dart';
 import 'screens/home/home_screen.dart';
 
@@ -38,16 +40,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          return Consumer<LanguageProvider>(
-            builder: (context, languageProvider, _) {
-              return MaterialApp(
+      child: BlocProvider(
+        create: (context) => OrderBloc(),
+        child: Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            return Consumer<LanguageProvider>(
+              builder: (context, languageProvider, _) {
+                return MaterialApp(
                 locale: languageProvider.appLocale,
-                supportedLocales: const [
-                  Locale('en', ''),
-                  Locale('he', ''),
-                ],
+                supportedLocales: const [Locale('en', ''), Locale('he', '')],
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
             },
           );
         },
+        ),
       ),
     );
   }

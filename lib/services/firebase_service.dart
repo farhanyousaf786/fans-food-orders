@@ -66,9 +66,14 @@ class FirebaseService {
         sound: true,
       );
 
-      _log('${Translate.get('notification_permission_status')}: ${settings.authorizationStatus}');
+      _log(
+        '${Translate.get('notification_permission_status')}: ${settings.authorizationStatus}',
+      );
     } catch (e, stackTrace) {
-      _log('❌ ${Translate.get('error_requesting_permissions')}: $e\n$stackTrace', isError: true);
+      _log(
+        '❌ ${Translate.get('error_requesting_permissions')}: $e\n$stackTrace',
+        isError: true,
+      );
       rethrow;
     }
   }
@@ -77,10 +82,17 @@ class FirebaseService {
     try {
       _log('Requesting FCM token...');
       final token = await _messaging.getToken();
-      _log(token != null ? '✅ Token: $token' : '⚠️ ${Translate.get('fcm_token_is_null')}');
+      _log(
+        token != null
+            ? '✅ Token: $token'
+            : '⚠️ ${Translate.get('fcm_token_is_null')}',
+      );
       return token;
     } catch (e, stackTrace) {
-      _log('❌ ${Translate.get('error_getting_fcm_token')}: $e\n$stackTrace', isError: true);
+      _log(
+        '❌ ${Translate.get('error_getting_fcm_token')}: $e\n$stackTrace',
+        isError: true,
+      );
       return null;
     }
   }

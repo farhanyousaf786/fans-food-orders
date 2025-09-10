@@ -199,6 +199,94 @@ class OrderDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            // Ticket Image Section
+            if (order.seatInfo['ticketImage'] != null && order.seatInfo['ticketImage'].toString().isNotEmpty)
+              Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.confirmation_number,
+                                color: theme.colorScheme.primary,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Ticket Image',
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: theme.colorScheme.outline.withOpacity(0.3),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                order.seatInfo['ticketImage'],
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    height: 200,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    color: theme.colorScheme.errorContainer,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: theme.colorScheme.error,
+                                            size: 32,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Failed to load ticket image',
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              color: theme.colorScheme.error,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
