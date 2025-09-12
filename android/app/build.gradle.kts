@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.fans_food_order"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
