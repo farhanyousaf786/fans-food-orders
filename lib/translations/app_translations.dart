@@ -726,6 +726,7 @@ class AppTranslations {
       'close_button': 'CLOSE',
       'order_status_updated_to': 'Order status updated to {status}',
       'failed_to_update_order_status': 'Failed to update order status',
+      'auto_assign_delivery_failed': 'Unable to assign delivery automatically. Enable location or add a driver manually.',
     },
 
     'he': {
@@ -764,6 +765,7 @@ class AppTranslations {
       'close_button': 'סגור',
       'order_status_updated_to': 'סטטוס ההזמנה עודכן ל-{status}',
       'failed_to_update_order_status': 'עדכון סטטוס ההזמנה נכשל',
+      'auto_assign_delivery_failed': 'לא ניתן להקצות שליח באופן אוטומטי. אפשר מיקום או הוסף שליח ידנית.',
 
       'entranceLabel': 'שער',
       'entranceHint': 'הכנס מספר/שם שער',

@@ -104,9 +104,9 @@ class StatusUpdateDialog extends StatelessWidget {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text('Unable to assign delivery automatically. Enable location or add a driver manually.'),
+                                      content: Text(Translate.get('auto_assign_delivery_failed')),
                                       action: SnackBarAction(
-                                        label: 'Settings',
+                                        label: Translate.get('settings'),
                                         onPressed: () {
                                           Geolocator.openAppSettings();
                                         },

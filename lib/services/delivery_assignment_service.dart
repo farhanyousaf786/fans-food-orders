@@ -7,85 +7,85 @@ class DeliveryAssignmentService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Finds the nearest active delivery user and assigns them to the order
-  static Future<String?> assignNearestDeliveryUser({
-    required String orderId,
-    required double orderLatitude,
-    required double orderLongitude,
-  }) async {
-    try {
-      debugPrint('🔍 SEARCHING for nearest delivery user...');
-      debugPrint(
-        '📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}',
-      );
-
-      // Get all active delivery users
-      final deliveryUsersSnapshot =
-          await _firestore
-              .collection('deliveryUsers')
-              .where('isActive', isEqualTo: true)
-              .get();
-
-      debugPrint(
-        '👥 Found ${deliveryUsersSnapshot.docs.length} active delivery users',
-      );
-
-      if (deliveryUsersSnapshot.docs.isEmpty) {
-        debugPrint('❌ No active delivery users found');
-        return null;
-      }
-
-      String? nearestUserId;
-      double shortestDistance = double.infinity;
-
-      // Calculate distance for each active delivery user
-      for (var doc in deliveryUsersSnapshot.docs) {
-        final data = doc.data();
-        final location = data['location'] as GeoPoint?;
-
-        if (location != null) {
-          // Calculate distance using Haversine formula
-          final distance = Geolocator.distanceBetween(
-            orderLatitude,
-            orderLongitude,
-            location.latitude,
-            location.longitude,
-          );
-
-          final distanceInKm = distance / 1000;
-          debugPrint(
-            'User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distanceInKm.toStringAsFixed(2)}km)',
-          );
-
-          if (distance < shortestDistance) {
-            shortestDistance = distance;
-            nearestUserId = doc.id;
-          }
-        }
-      }
-
-      if (nearestUserId != null) {
-        // Update the order with the nearest delivery user ID
-        await _firestore.collection('orders').doc(orderId).update({
-          'deliveryUserId': nearestUserId,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-
-        final shortestDistanceInKm = shortestDistance / 1000;
-        debugPrint(
-          '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
-        );
-        debugPrint(
-          '📍 Distance: ${shortestDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
-        );
-        return nearestUserId;
-      }
-
-      return null;
-    } catch (e) {
-      debugPrint('Error assigning delivery user: $e');
-      return null;
-    }
-  }
+  // static Future<String?> assignNearestDeliveryUser({
+  //   required String orderId,
+  //   required double orderLatitude,
+  //   required double orderLongitude,
+  // }) async {
+  //   try {
+  //     debugPrint('🔍 SEARCHING for nearest delivery user...');
+  //     debugPrint(
+  //       '📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}',
+  //     );
+  //
+  //     // Get all active delivery users
+  //     final deliveryUsersSnapshot =
+  //         await _firestore
+  //             .collection('deliveryUsers')
+  //             .where('isActive', isEqualTo: true)
+  //             .get();
+  //
+  //     debugPrint(
+  //       '👥 Found ${deliveryUsersSnapshot.docs.length} active delivery users',
+  //     );
+  //
+  //     if (deliveryUsersSnapshot.docs.isEmpty) {
+  //       debugPrint('❌ No active delivery users found');
+  //       return null;
+  //     }
+  //
+  //     String? nearestUserId;
+  //     double shortestDistance = double.infinity;
+  //
+  //     // Calculate distance for each active delivery user
+  //     for (var doc in deliveryUsersSnapshot.docs) {
+  //       final data = doc.data();
+  //       final location = data['location'] as GeoPoint?;
+  //
+  //       if (location != null) {
+  //         // Calculate distance using Haversine formula
+  //         final distance = Geolocator.distanceBetween(
+  //           orderLatitude,
+  //           orderLongitude,
+  //           location.latitude,
+  //           location.longitude,
+  //         );
+  //
+  //         final distanceInKm = distance / 1000;
+  //         debugPrint(
+  //           'User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distanceInKm.toStringAsFixed(2)}km)',
+  //         );
+  //
+  //         if (distance < shortestDistance) {
+  //           shortestDistance = distance;
+  //           nearestUserId = doc.id;
+  //         }
+  //       }
+  //     }
+  //
+  //     if (nearestUserId != null) {
+  //       // Update the order with the nearest delivery user ID
+  //       await _firestore.collection('orders').doc(orderId).update({
+  //         'deliveryUserId': nearestUserId,
+  //         'updatedAt': FieldValue.serverTimestamp(),
+  //       });
+  //
+  //       final shortestDistanceInKm = shortestDistance / 1000;
+  //       debugPrint(
+  //         '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
+  //       );
+  //       debugPrint(
+  //         '📍 Distance: ${shortestDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
+  //       );
+  //       return nearestUserId;
+  //     }
+  //
+  //     return null;
+  //   } catch (e) {
+  //     debugPrint('Error assigning delivery user: $e');
+  //     return null;
+  //   }
+  // }
 
   static double calculateDistance(
     double lat1,
@@ -137,21 +137,26 @@ class DeliveryAssignmentService {
         }
       }
 
-      // Update the order with the nearest delivery user ID
-      await _firestore.collection('orders').doc(orderId).update({
-        'deliveryUserId': nearestUserId,
-        'status': OrderStatus.delivering.index,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      // Only update the order if a nearest delivery user was found
+      if (nearestUserId.isNotEmpty) {
+        await _firestore.collection('orders').doc(orderId).update({
+          'deliveryUserId': nearestUserId,
+          'status': OrderStatus.delivering.index,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
 
-      final shortestDistanceInKm = minDistance / 1000;
-      debugPrint(
-        '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
-      );
-      debugPrint(
-        '📍 Distance: ${minDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
-      );
-      return nearestUserId.isEmpty ? null : nearestUserId;
+        final shortestDistanceInKm = minDistance / 1000;
+        debugPrint(
+          '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
+        );
+        debugPrint(
+          '📍 Distance: ${minDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
+        );
+        return nearestUserId;
+      } else {
+        debugPrint('❌ No nearest delivery user found to assign for order $orderId');
+        return null;
+      }
 
 
 
@@ -226,30 +231,30 @@ class DeliveryAssignmentService {
   }
 
   /// Assign using the order's saved location (order.location or order.customerLocation)
-  static Future<String?> assignNearestDeliveryUserUsingOrderLocation({
-    required String orderId,
-  }) async {
-    try {
-      final doc = await _firestore.collection('orders').doc(orderId).get();
-      if (!doc.exists) {
-        debugPrint('Order $orderId not found');
-        return null;
-      }
-      final data = doc.data()!;
-      GeoPoint? geo = data['location'] as GeoPoint?;
-      geo ??= data['customerLocation'] as GeoPoint?;
-      if (geo == null) {
-        debugPrint('Order has no saved location');
-        return null;
-      }
-      return assignNearestDeliveryUser(
-        orderId: orderId,
-        orderLatitude: geo.latitude,
-        orderLongitude: geo.longitude,
-      );
-    } catch (e) {
-      debugPrint('Error assigning using order location: $e');
-      return null;
-    }
-  }
+  // static Future<String?> assignNearestDeliveryUserUsingOrderLocation({
+  //   required String orderId,
+  // }) async {
+  //   try {
+  //     final doc = await _firestore.collection('orders').doc(orderId).get();
+  //     if (!doc.exists) {
+  //       debugPrint('Order $orderId not found');
+  //       return null;
+  //     }
+  //     final data = doc.data()!;
+  //     GeoPoint? geo = data['location'] as GeoPoint?;
+  //     geo ??= data['customerLocation'] as GeoPoint?;
+  //     if (geo == null) {
+  //       debugPrint('Order has no saved location');
+  //       return null;
+  //     }
+  //     return assignNearestDeliveryUser(
+  //       orderId: orderId,
+  //       orderLatitude: geo.latitude,
+  //       orderLongitude: geo.longitude,
+  //     );
+  //   } catch (e) {
+  //     debugPrint('Error assigning using order location: $e');
+  //     return null;
+  //   }
+  // }
 }
