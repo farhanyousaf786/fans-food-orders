@@ -13,15 +13,20 @@ class DeliveryAssignmentService {
   }) async {
     try {
       debugPrint('🔍 SEARCHING for nearest delivery user...');
-      debugPrint('📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}');
-      
-      // Get all active delivery users
-      final deliveryUsersSnapshot = await _firestore
-          .collection('deliveryUsers')
-          .where('isActive', isEqualTo: true)
-          .get();
+      debugPrint(
+        '📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}',
+      );
 
-      debugPrint('👥 Found ${deliveryUsersSnapshot.docs.length} active delivery users');
+      // Get all active delivery users
+      final deliveryUsersSnapshot =
+          await _firestore
+              .collection('deliveryUsers')
+              .where('isActive', isEqualTo: true)
+              .get();
+
+      debugPrint(
+        '👥 Found ${deliveryUsersSnapshot.docs.length} active delivery users',
+      );
 
       if (deliveryUsersSnapshot.docs.isEmpty) {
         debugPrint('❌ No active delivery users found');
@@ -35,7 +40,7 @@ class DeliveryAssignmentService {
       for (var doc in deliveryUsersSnapshot.docs) {
         final data = doc.data();
         final location = data['location'] as GeoPoint?;
-        
+
         if (location != null) {
           // Calculate distance using Haversine formula
           final distance = Geolocator.distanceBetween(
@@ -46,7 +51,9 @@ class DeliveryAssignmentService {
           );
 
           final distanceInKm = distance / 1000;
-          debugPrint('User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distanceInKm.toStringAsFixed(2)}km)');
+          debugPrint(
+            'User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distanceInKm.toStringAsFixed(2)}km)',
+          );
 
           if (distance < shortestDistance) {
             shortestDistance = distance;
@@ -63,12 +70,70 @@ class DeliveryAssignmentService {
         });
 
         final shortestDistanceInKm = shortestDistance / 1000;
-        debugPrint('✅ ASSIGNED: Delivery user $nearestUserId to order $orderId');
-        debugPrint('📍 Distance: ${shortestDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)');
+        debugPrint(
+          '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
+        );
+        debugPrint(
+          '📍 Distance: ${shortestDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
+        );
         return nearestUserId;
       }
 
       return null;
+    } catch (e) {
+      debugPrint('Error assigning delivery user: $e');
+      return null;
+    }
+  }
+
+  static double calculateDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
+    return Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+  }
+
+  static Future<String?> getNearestDeliveryUser({
+    required String orderId,
+    required double orderLatitude,
+    required double orderLongitude,
+  }) async {
+    try {
+      final deliveryUsers =
+          await FirebaseFirestore.instance
+              .collection('deliveryUsers')
+              .where('isActive', isEqualTo: true)
+              .get();
+
+      if (deliveryUsers.docs.isEmpty) return null;
+
+      var nearestUserId = '';
+      var minDistance = double.infinity;
+
+      for (var doc in deliveryUsers.docs) {
+        final userData = doc.data();
+        if (userData['location'] == null) continue;
+
+        final GeoPoint location = userData['location'];
+
+        final distance = calculateDistance(
+          orderLatitude,
+          orderLongitude,
+          location.latitude,
+          location.longitude,
+        );
+        debugPrint(
+          'User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distance.toStringAsFixed(2)}km)',
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestUserId = doc.id;
+        }
+      }
+
+      return nearestUserId.isEmpty ? null : nearestUserId;
     } catch (e) {
       debugPrint('Error assigning delivery user: $e');
       return null;
@@ -97,7 +162,9 @@ class DeliveryAssignmentService {
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        debugPrint('Location permission denied forever. Ask user to enable in settings.');
+        debugPrint(
+          'Location permission denied forever. Ask user to enable in settings.',
+        );
         return null;
       }
 
@@ -106,7 +173,7 @@ class DeliveryAssignmentService {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      return await assignNearestDeliveryUser(
+      return await getNearestDeliveryUser(
         orderId: orderId,
         orderLatitude: position.latitude,
         orderLongitude: position.longitude,
@@ -118,9 +185,12 @@ class DeliveryAssignmentService {
   }
 
   /// Gets delivery user information by ID
-  static Future<Map<String, dynamic>?> getDeliveryUserInfo(String userId) async {
+  static Future<Map<String, dynamic>?> getDeliveryUserInfo(
+    String userId,
+  ) async {
     try {
-      final doc = await _firestore.collection('deliveryUsers').doc(userId).get();
+      final doc =
+          await _firestore.collection('deliveryUsers').doc(userId).get();
       if (doc.exists) {
         return doc.data();
       }
@@ -158,6 +228,4 @@ class DeliveryAssignmentService {
       return null;
     }
   }
-
- 
 }
