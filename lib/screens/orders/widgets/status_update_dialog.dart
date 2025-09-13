@@ -1,7 +1,9 @@
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../models/order_status.dart';
 import '../../../services/firebase_service.dart';
+import '../../../services/delivery_assignment_service.dart';
 
 class StatusUpdateDialog extends StatelessWidget {
   final String orderId;
@@ -79,14 +81,46 @@ class StatusUpdateDialog extends StatelessWidget {
                           Navigator.pop(context); // Close the dialog
                           if (success) {
                             onStatusUpdated(status.index);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(Translate.get('order_status_updated_to')
-                                    .replaceAll('{status}', status.toTranslatedString())),
+                            // If status set to delivering, auto-assign nearest delivery user
+                            if (status == OrderStatus.delivering) {
+                              // Use INSTANT device location for assignment (as requested)
+                              final String? assignedUserId = await DeliveryAssignmentService
+                                  .assignNearestDeliveryUserFromCurrentLocation(orderId: orderId);
 
-                                backgroundColor: theme.colorScheme.primary,
-                              ),
-                            );
+                              if (context.mounted) {
+                                if (assignedUserId != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${Translate.get('order_status_updated_to').replaceAll('{status}', status.toTranslatedString())} • Assigned: $assignedUserId',
+                                      ),
+                                      backgroundColor: theme.colorScheme.primary,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text('Unable to assign delivery automatically. Enable location or add a driver manually.'),
+                                      action: SnackBarAction(
+                                        label: 'Settings',
+                                        onPressed: () {
+                                          Geolocator.openAppSettings();
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(Translate.get('order_status_updated_to')
+                                      .replaceAll('{status}', status.toTranslatedString())),
+
+                                  backgroundColor: theme.colorScheme.primary,
+                                ),
+                              );
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
