@@ -72,10 +72,13 @@ class StatusUpdateDialog extends StatelessWidget {
                       );
 
                       if (confirmed == true) {
-                        // final success = await FirebaseService.updateOrderStatus(
-                        //   orderId: orderId,
-                        //   newStatus: status.index,
-                        // );
+                        if (status != OrderStatus.delivering){
+                          final success = await FirebaseService.updateOrderStatus(
+                            orderId: orderId,
+                            newStatus: status.index,
+                          );
+                        }
+
 
                         if (context.mounted) {
                           Navigator.pop(context); // Close the dialog
