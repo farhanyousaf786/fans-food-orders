@@ -124,16 +124,30 @@ class DeliveryAssignmentService {
           location.latitude,
           location.longitude,
         );
-        debugPrint(
-          'User ${doc.id}: Distance = ${distance.toStringAsFixed(2)}m (${distance.toStringAsFixed(2)}km)',
-        );
+
         if (distance < minDistance) {
           minDistance = distance;
           nearestUserId = doc.id;
         }
       }
 
+      // Update the order with the nearest delivery user ID
+      await _firestore.collection('orders').doc(orderId).update({
+        'deliveryUserId': nearestUserId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      final shortestDistanceInKm = minDistance / 1000;
+      debugPrint(
+        '✅ ASSIGNED: Delivery user $nearestUserId to order $orderId',
+      );
+      debugPrint(
+        '📍 Distance: ${minDistance.toStringAsFixed(2)}m (${shortestDistanceInKm.toStringAsFixed(2)}km)',
+      );
       return nearestUserId.isEmpty ? null : nearestUserId;
+
+
+
     } catch (e) {
       debugPrint('Error assigning delivery user: $e');
       return null;
@@ -178,6 +192,8 @@ class DeliveryAssignmentService {
         orderLatitude: position.latitude,
         orderLongitude: position.longitude,
       );
+
+
     } catch (e) {
       debugPrint('Error getting current location for delivery assignment: $e');
       return null;
