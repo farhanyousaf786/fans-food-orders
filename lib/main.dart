@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
                         : const SignInScreen();
                   },
                 ),
+                debugShowCheckedModeBanner: false,
               );
             },
           );
