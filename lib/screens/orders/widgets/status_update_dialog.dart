@@ -72,15 +72,15 @@ class StatusUpdateDialog extends StatelessWidget {
                       );
 
                       if (confirmed == true) {
-                        final success = await FirebaseService.updateOrderStatus(
-                          orderId: orderId,
-                          newStatus: status.index,
-                        );
+                        // final success = await FirebaseService.updateOrderStatus(
+                        //   orderId: orderId,
+                        //   newStatus: status.index,
+                        // );
 
                         if (context.mounted) {
                           Navigator.pop(context); // Close the dialog
-                          if (success) {
-                            onStatusUpdated(status.index);
+
+
                             // If status set to delivering, auto-assign nearest delivery user
                             if (status == OrderStatus.delivering) {
                               // Use INSTANT device location for assignment (as requested)
@@ -89,6 +89,7 @@ class StatusUpdateDialog extends StatelessWidget {
 
                               if (context.mounted) {
                                 if (assignedUserId != null) {
+                                  onStatusUpdated(status.index);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
@@ -130,7 +131,7 @@ class StatusUpdateDialog extends StatelessWidget {
                             );
                           }
                         }
-                      }
+
                     },
             );
           }).toList(),

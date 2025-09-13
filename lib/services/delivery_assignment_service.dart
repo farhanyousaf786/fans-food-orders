@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fans_food_order/models/order_status.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 
@@ -138,6 +139,7 @@ class DeliveryAssignmentService {
       // Update the order with the nearest delivery user ID
       await _firestore.collection('orders').doc(orderId).update({
         'deliveryUserId': nearestUserId,
+        'status': OrderStatus.delivering.index,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
