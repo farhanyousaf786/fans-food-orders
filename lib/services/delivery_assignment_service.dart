@@ -101,6 +101,10 @@ class DeliveryAssignmentService {
     required double orderLongitude,
   }) async {
     try {
+
+      debugPrint(
+        '📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}',
+      );
       final deliveryUsers =
           await FirebaseFirestore.instance
               .collection('deliveryUsers')
@@ -186,6 +190,7 @@ class DeliveryAssignmentService {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
 
       return await getNearestDeliveryUser(
         orderId: orderId,
