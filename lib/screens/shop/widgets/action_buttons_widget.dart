@@ -18,6 +18,7 @@ class ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         // View Orders Button
@@ -28,10 +29,13 @@ class ActionButtons extends StatelessWidget {
             icon: const Icon(Icons.receipt_long),
             label: Text(Translate.get('viewOrders')),
             style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              elevation: 1.5,
             ),
           ),
         ),
@@ -51,6 +55,8 @@ class ActionButtons extends StatelessWidget {
                 : const Icon(Icons.my_location_outlined),
             label: Text(isUpdating ? Translate.get('updating') : Translate.get('updateLocation')),
             style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.primary,
+              side: BorderSide(color: theme.colorScheme.primary, width: 1.4),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

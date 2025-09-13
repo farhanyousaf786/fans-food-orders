@@ -32,8 +32,12 @@ class ThemeProvider with ChangeNotifier {
     useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6750A4),
+      seedColor: const Color.fromARGB(255, 17, 77, 241),
       brightness: Brightness.light,
+    ),
+    appBarTheme: const AppBarTheme(
+      centerTitle: true,
+      elevation: 0,
     ),
     cardTheme: CardThemeData(
       elevation: 2,
@@ -47,6 +51,15 @@ class ThemeProvider with ChangeNotifier {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        side: const BorderSide(width: 1.4),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -63,8 +76,12 @@ class ThemeProvider with ChangeNotifier {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6750A4),
+      seedColor: const Color.fromARGB(255, 22, 118, 226),
       brightness: Brightness.dark,
+    ),
+    appBarTheme: const AppBarTheme(
+      centerTitle: true,
+      elevation: 0,
     ),
     cardTheme: CardThemeData(
       elevation: 2,
@@ -78,6 +95,15 @@ class ThemeProvider with ChangeNotifier {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        side: const BorderSide(width: 1.4),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

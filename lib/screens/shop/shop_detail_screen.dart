@@ -8,7 +8,6 @@ import '../../models/shop_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firebase_service.dart';
 import '../orders/orders_list_screen.dart';
-import 'widgets/shop_header_widget.dart';
 import 'widgets/location_info_card.dart';
 import 'widgets/stadium_info_card.dart';
 import 'widgets/action_buttons_widget.dart';
@@ -114,22 +113,31 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(shop.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // TODO: Implement edit functionality
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Shop Header
-            ShopHeader(shop: shop),
+            // Action Buttons at top
+            ActionButtons(
+              shop: shop,
+              isUpdating: _isUpdatingLocation,
+              onViewOrdersPressed: _isUpdatingLocation
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrdersListScreen(shop: shop),
+                        ),
+                      );
+                    },
+              onUpdateLocationPressed:
+                  _isUpdatingLocation ? null : _updateLocation,
+            ),
+
+            const SizedBox(height: 24),
 
             // Location Info Card
             LocationInfoCard(
@@ -162,24 +170,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
 
             const SizedBox(height: 32),
-
-            // Action Buttons
-            ActionButtons(
-              shop: shop,
-              isUpdating: _isUpdatingLocation,
-              onViewOrdersPressed: _isUpdatingLocation
-                  ? null
-                  : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrdersListScreen(shop: shop),
-                        ),
-                      );
-                    },
-              onUpdateLocationPressed:
-                  _isUpdatingLocation ? null : _updateLocation,
-            ),
           ],
         ),
       ),
