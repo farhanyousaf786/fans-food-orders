@@ -1,6 +1,7 @@
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
+import '../../../widgets/app_colors.dart';
 
 class ActionButtons extends StatelessWidget {
   final ShopModel shop;
@@ -29,7 +30,7 @@ class ActionButtons extends StatelessWidget {
             icon: const Icon(Icons.receipt_long),
             label: Text(Translate.get('viewOrders')),
             style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
+              backgroundColor: AppColors.primaryColor,
               foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -52,11 +53,11 @@ class ActionButtons extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.my_location_outlined),
-            label: Text(isUpdating ? Translate.get('updating') : Translate.get('updateLocation')),
+                : const Icon(Icons.my_location_outlined,color: AppColors.primaryColor,),
+            label: Text(isUpdating ? Translate.get('updating') : Translate.get('updateLocation'),style: TextStyle(color: AppColors.primaryColor),),
             style: OutlinedButton.styleFrom(
               foregroundColor: theme.colorScheme.primary,
-              side: BorderSide(color: theme.colorScheme.primary, width: 1.4),
+              side: BorderSide(color: AppColors.primaryColor, width: 1.4),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -1,6 +1,7 @@
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
+import '../../../widgets/app_colors.dart';
 
 class StadiumInfoCard extends StatelessWidget {
   final ShopModel shop;
@@ -12,6 +13,7 @@ class StadiumInfoCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Card(
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -21,11 +23,11 @@ class StadiumInfoCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+                  backgroundColor: AppColors.primaryColor.withOpacity(0.12),
                   child: Icon(
                     Icons.stadium_outlined,
                     size: 18,
-                    color: theme.colorScheme.primary,
+                    color: AppColors.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -33,7 +35,7 @@ class StadiumInfoCard extends StatelessWidget {
                   Translate.get('stadiumInformation'),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.primary,
+                    color: AppColors.primaryColor,
                   ),
                 ),
               ],
@@ -57,7 +59,7 @@ class StadiumInfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: theme.colorScheme.primary),
+          Icon(icon, size: 20, color: AppColors.primaryColor),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

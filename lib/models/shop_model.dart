@@ -8,6 +8,7 @@ class ShopModel {
   final String floor;
   final String gate;
   final String stadiumId;
+  final String stadiumName;
   final List<String> admins;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -22,6 +23,7 @@ class ShopModel {
     required this.floor,
     required this.gate,
     required this.stadiumId,
+    required this.stadiumName,
     required this.admins,
     required this.createdAt,
     required this.updatedAt,
@@ -37,6 +39,7 @@ class ShopModel {
       'floor': floor,
       'gate': gate,
       'stadiumId': stadiumId,
+      'stadiumName': stadiumName,
       'admins': admins,
       'latitude': latitude,
       'longitude': longitude,
@@ -55,6 +58,7 @@ class ShopModel {
       floor: data['floor'] ?? '',
       gate: data['gate'] ?? '',
       stadiumId: data['stadiumId'] ?? '',
+      stadiumName: data['stadiumName'] ?? '',
       admins: List<String>.from(data['admins'] ?? []),
       latitude: (data['latitude'] as num?)?.toDouble(),
       longitude: (data['longitude'] as num?)?.toDouble(),
@@ -80,6 +84,7 @@ class ShopModel {
     String? floor,
     String? gate,
     String? stadiumId,
+    String? stadiumName,
     List<String>? admins,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -94,6 +99,7 @@ class ShopModel {
       floor: floor ?? this.floor,
       gate: gate ?? this.gate,
       stadiumId: stadiumId ?? this.stadiumId,
+      stadiumName: stadiumName ?? this.stadiumName,
       admins: admins ?? this.admins,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

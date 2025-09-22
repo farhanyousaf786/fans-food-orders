@@ -1,6 +1,7 @@
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/material.dart';
 import '../../../models/shop_model.dart';
+import '../../../widgets/app_colors.dart';
 
 class LocationInfoCard extends StatelessWidget {
   final ShopModel shop;
@@ -17,6 +18,7 @@ class LocationInfoCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Card(
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -33,7 +35,7 @@ class LocationInfoCard extends StatelessWidget {
                       child: Icon(
                         Icons.place_outlined,
                         size: 18,
-                        color: theme.colorScheme.primary,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -41,7 +43,7 @@ class LocationInfoCard extends StatelessWidget {
                       Translate.get('locationInformation'),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.primary,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ],
@@ -82,7 +84,7 @@ class LocationInfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: theme.colorScheme.primary),
+          Icon(icon, size: 20, color: AppColors.primaryColor),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

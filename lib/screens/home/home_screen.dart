@@ -1,7 +1,9 @@
 import 'package:fans_food_order/providers/language_provider.dart';
 import 'package:fans_food_order/translations/app_translations.dart';
 import 'package:fans_food_order/translations/translate.dart';
+import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -90,12 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final authProvider = Provider.of<AuthProvider>(context);
     final theme = Theme.of(context);
 
     // Show loading indicator while checking auth state
     if (authProvider.isLoading) {
       return Scaffold(
+        backgroundColor: AppColors.bgColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -126,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: AppColors.bgColor,
       appBar: AppBar(
         title: Text(Translate.get('my_shops')),
         elevation: 0,
@@ -213,95 +218,187 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildShopCard(ShopModel shop, ThemeData theme, BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ShopDetailScreen(shop: shop),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.store,
-                      size: 28,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          shop.name,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          shop.description,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.textTheme.bodySmall?.color,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(Icons.location_on, shop.location, theme),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildDetailRow(
-                      Icons.stairs,
-                      '${Translate.get('floor')}: ${shop.floor}',
-                      theme,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildDetailRow(
-                      Icons.door_front_door,
-                      '${Translate.get('gate')}: ${shop.gate}',
-                      theme,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${Translate.get('updated')}: ${DateFormat('MMM d, y • h:mm a').format(shop.updatedAt)}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 12,
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
-                ),
-              ),
-            ],
+    // return Card(
+    //   margin: const EdgeInsets.only(bottom: 16),
+    //   elevation: 2,
+    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    //   child: InkWell(
+    //     borderRadius: BorderRadius.circular(12),
+    //     onTap: () {
+    //       Navigator.push(
+    //         context,
+    //         MaterialPageRoute(
+    //           builder: (context) => ShopDetailScreen(shop: shop),
+    //         ),
+    //       );
+    //     },
+    //     child: Padding(
+    //       padding: const EdgeInsets.all(16),
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.start,
+    //         children: [
+    //           Row(
+    //             children: [
+    //               Container(
+    //                 padding: const EdgeInsets.all(12),
+    //                 decoration: BoxDecoration(
+    //                   color: theme.colorScheme.primary.withOpacity(0.1),
+    //                   shape: BoxShape.circle,
+    //                 ),
+    //                 child: Icon(
+    //                   Icons.store,
+    //                   size: 28,
+    //                   color: theme.colorScheme.primary,
+    //                 ),
+    //               ),
+    //               const SizedBox(width: 16),
+    //               Expanded(
+    //                 child: Column(
+    //                   crossAxisAlignment: CrossAxisAlignment.start,
+    //                   children: [
+    //                     Text(
+    //                       shop.name,
+    //                       style: theme.textTheme.titleLarge?.copyWith(
+    //                         fontWeight: FontWeight.bold,
+    //                       ),
+    //                     ),
+    //                     const SizedBox(height: 4),
+    //                     Text(
+    //                       shop.description,
+    //                       style: theme.textTheme.bodyMedium?.copyWith(
+    //                         color: theme.textTheme.bodySmall?.color,
+    //                       ),
+    //                       maxLines: 2,
+    //                       overflow: TextOverflow.ellipsis,
+    //                     ),
+    //                   ],
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //           const SizedBox(height: 16),
+    //           _buildDetailRow(Icons.location_on, shop.location, theme),
+    //           const SizedBox(height: 8),
+    //           Row(
+    //             children: [
+    //               Expanded(
+    //                 child: _buildDetailRow(
+    //                   Icons.stairs,
+    //                   '${Translate.get('floor')}: ${shop.floor}',
+    //                   theme,
+    //                 ),
+    //               ),
+    //               Expanded(
+    //                 child: _buildDetailRow(
+    //                   Icons.door_front_door,
+    //                   '${Translate.get('gate')}: ${shop.gate}',
+    //                   theme,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //           const SizedBox(height: 8),
+    //           Text(
+    //             '${Translate.get('updated')}: ${DateFormat('MMM d, y • h:mm a').format(shop.updatedAt)}',
+    //             style: theme.textTheme.bodySmall?.copyWith(
+    //               fontSize: 12,
+    //               color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ShopDetailScreen(shop: shop),
           ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Image.asset(
+                'assets/png/shop_img.png',
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    shop.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _DescriptionWithSeeMore(text: shop.description),
+                  const SizedBox(height: 10),
+                  _InfoRow(
+                    icon: 'ic_loc',
+
+                    text: shop.location,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _InfoRow(
+                          icon: 'ic_stadium',
+
+                          text: shop.stadiumName,
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _InfoRow(
+                          icon: 'ic_floor',
+
+                          text: '${Translate.get('floor')} ${shop.floor}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  _InfoRow(
+                    icon: 'ic_stadium',
+                    text: '${Translate.get('gate')} ${shop.gate}',
+                  ),
+
+
+
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -507,6 +604,62 @@ class _NewOrderDialog extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon,  required this.text});
+
+  final String icon;
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SvgPicture.asset(
+          "assets/svg/$icon.svg",
+
+        ),
+
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DescriptionWithSeeMore extends StatelessWidget {
+  const _DescriptionWithSeeMore({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(fontSize: 13, color: Colors.grey.shade700);
+    final span = TextSpan(text: text, style: style);
+    return RichText(
+      text: TextSpan(
+        children: [
+          span,
+
+        ],
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

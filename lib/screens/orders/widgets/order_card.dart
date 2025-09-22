@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../../../models/order.dart';
 import '../../../models/order_status.dart';
+import '../../../widgets/app_colors.dart';
 import '../screens/order_details_screen.dart';
 
 class OrderCard extends StatelessWidget {
@@ -25,6 +26,7 @@ class OrderCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -93,8 +95,9 @@ class OrderCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
+                    child:
+                    ElevatedButton.icon(
+                      onPressed:  () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -102,12 +105,34 @@ class OrderCard extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Text(Translate.get('view_details')),
+                      icon: const Icon(Icons.receipt_long),
+                      label: Text(Translate.get('view_details')),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 1.5,
+                      ),
                     ),
+
+
+
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: AppColors.primaryColor, // <-- change to your desired color
+                          width: 2,           // optional, default is 1
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // optional rounded corners
+                        ),
+                      ),
                       onPressed: () async {
                         await showStatusUpdateDialog(
                           context: context,
@@ -118,7 +143,7 @@ class OrderCard extends StatelessWidget {
                           },
                         );
                       },
-                      child: Text(Translate.get('update_status')),
+                      child: Text(Translate.get('update_status'),style: TextStyle(color: AppColors.primaryColor),),
                     ),
                   ),
                 ],

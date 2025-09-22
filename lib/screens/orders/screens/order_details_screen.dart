@@ -1,8 +1,10 @@
 import 'package:fans_food_order/translations/translate.dart';
+import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../models/order.dart';
 
 import '../../../models/order_status.dart';
+import '../../../translations/language_service.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
@@ -11,9 +13,11 @@ class OrderDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = LanguageService.getCurrentLanguage();
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
         title: Text('${Translate.get('order')} #${order.id}'),
         leading: IconButton(
@@ -52,6 +56,7 @@ class OrderDetailsScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = order.cart[index];
                 return Card(
+                  color: Colors.white,
                   margin: const EdgeInsets.only(bottom: 10),
                   child: ListTile(
                     leading: item.images.isNotEmpty
@@ -68,9 +73,9 @@ class OrderDetailsScreen extends StatelessWidget {
                             child: Icon(Icons.fastfood,
                                 color: Colors.grey[400]),
                           ),
-                    title: Text(item.name),
+                    title: Text(item.nameFor(lang)),
                     subtitle: Text(
-                      item.description,
+                      item.descriptionFor(lang),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -93,6 +98,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // Order Summary Section
             const SizedBox(height: 20),
             Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -119,6 +125,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // Customer Information Section
             const SizedBox(height: 20),
             Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -160,6 +167,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // Seat Information
             const SizedBox(height: 20),
             Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -184,9 +192,8 @@ class OrderDetailsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         _buildDeliveryInfoRow(Icons.event_seat, Translate.get('seat_no'),
                             order.seatInfo['seatNo'] ?? '-'),
-                        const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.details, Translate.get('seat_details'),
-                            order.seatInfo['seatDetails'] ?? '-'),
+
+
                         const SizedBox(height: 8),
                         _buildDeliveryInfoRow(Icons.grid_view, Translate.get('section'),
                             order.seatInfo['section'] ?? '-'),
@@ -241,7 +248,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                 fit: BoxFit.cover,
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
-                                  return Container(
+                                  return SizedBox(
                                     height: 200,
                                     child: Center(
                                       child: CircularProgressIndicator(

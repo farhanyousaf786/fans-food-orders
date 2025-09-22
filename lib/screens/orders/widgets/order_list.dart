@@ -46,6 +46,21 @@ class OrderList extends StatelessWidget {
           itemCount: orders.length,
           itemBuilder: (context, index) {
             final order = orders[index];
+            // debugPrint("ORDER LOG --->");
+            //
+            // debugPrint("orderId: ${order.orderId}");
+            // debugPrint("total: ${order.total}");
+            // debugPrint("subtotal: ${order.subtotal}");
+            // debugPrint("deliveryFee: ${order.deliveryFee}");
+            // debugPrint("discount: ${order.discount}");
+            // debugPrint("tipAmount: ${order.tipAmount} (added: ${order.isTipAdded})");
+            // debugPrint("userInfo: ${order.userInfo}");
+            // debugPrint("stadiumId: ${order.stadiumId}, shopId: ${order.shopId}");
+            // debugPrint("orderCode: ${order.orderCode}");
+            // debugPrint("seatInfo: ${order.seatInfo}");
+            // debugPrint("deliveryUserId: ${order.deliveryUserId}");
+            // debugPrint("createdAt: ${order.createdAt}");
+            // debugPrint("cart items: ${order.cart.map((f) =>   'name:' "${f.nameMap['en']}  'Qty:" "${f.quantity}  'Price:" "${f.price}").join(", ")}");
             return OrderCard(
               order: order,
               onStatusUpdated: onStatusUpdated,

@@ -1,4 +1,5 @@
 import 'package:fans_food_order/translations/translate.dart';
+import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../models/order_status.dart';
 import '../../models/shop_model.dart';
@@ -42,6 +43,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
         title: Text('${Translate.get('orders')} - ${widget.shop.name}'),
         bottom: TabBar(

@@ -1,4 +1,5 @@
 import 'package:fans_food_order/translations/translate.dart';
+import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -107,10 +108,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final theme = Theme.of(context);
     final shop = widget.shop;
 
     return Scaffold(
+      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
         title: Text(shop.name),
       ),
@@ -150,24 +153,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             // Stadium Info Card
             StadiumInfoCard(shop: shop),
 
-            const SizedBox(height: 24),
-
-            // Timestamps
-            Text(
-              Translate.get('timestamps'),
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${Translate.get('created')}: ${DateFormat('MMM d, y - h:mm a').format(shop.createdAt)}',
-              style: theme.textTheme.bodySmall,
-            ),
-            Text(
-              '${Translate.get('last_updated')}: ${DateFormat('MMM d, y - h:mm a').format(shop.updatedAt)}',
-              style: theme.textTheme.bodySmall,
-            ),
 
             const SizedBox(height: 32),
           ],
