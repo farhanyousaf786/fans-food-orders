@@ -86,15 +86,6 @@ class FirebaseService {
     try {
       _log('Requesting FCM token...');
 
-      final token = await _messaging.getToken();
-      _log(
-        token != null
-            ? '✅ Token: $token'
-            : '⚠️ ${Translate.get('fcm_token_is_null')}',
-      );
-      return token;
-
-
       // On iOS Simulator, APNS token is not available; skip to avoid apns-token-not-set errors
       if (_isIOS()) {
         try {

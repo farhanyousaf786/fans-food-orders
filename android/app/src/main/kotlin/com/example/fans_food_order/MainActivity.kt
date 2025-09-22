@@ -1,4 +1,4 @@
-package com.example.fans_food_order
+package com.fanmunch.fansfoodorder
 
 import io.flutter.embedding.android.FlutterActivity
 

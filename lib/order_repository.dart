@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
-
 import 'package:hive/hive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../models/food.dart';
 import 'models/order.dart' as model;
 
@@ -64,4 +62,3 @@ class OrderRepository {
     });
   }
 }
-

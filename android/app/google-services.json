@@ -26,6 +26,44 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:267118373830:android:90cde79a6b03867ffc60c7",
+        "android_client_info": {
+          "package_name": "com.fanmunch.fansfoodorder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk0dB043MPcJDKDqq_Uf-jJUuQK2mjXiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267118373830:android:9bbabcab196d916efc60c7",
+        "android_client_info": {
+          "package_name": "com.fanmunchdelivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk0dB043MPcJDKDqq_Uf-jJUuQK2mjXiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:267118373830:android:92f8d9bd8f965312fc60c7",
         "android_client_info": {
           "package_name": "com.fansfood"
