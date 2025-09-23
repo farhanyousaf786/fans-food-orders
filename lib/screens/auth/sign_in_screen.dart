@@ -1,4 +1,5 @@
 import 'package:fans_food_order/translations/translate.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -27,6 +28,19 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _handleSignIn(AuthProvider auth) async {
+
+    String? apnsToken = await FirebaseMessaging
+        .instance
+        .getAPNSToken();
+    print("APNS Token: $apnsToken");
+
+    print("FCM Token>>>>>>>>");
+    await Future.delayed(Duration(seconds: 1));
+    String? token =
+    await FirebaseMessaging.instance.getToken();
+    print("FCM Token: $token");
+
+
     if (_formKey.currentState?.validate() ?? false) {
       try {
         await auth.signIn(
