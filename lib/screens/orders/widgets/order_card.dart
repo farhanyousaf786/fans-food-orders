@@ -136,7 +136,7 @@ class OrderCard extends StatelessWidget {
                       onPressed: () async {
                         await showStatusUpdateDialog(
                           context: context,
-                          orderId: order.id??'',
+                          orderModel: order,
                           currentStatus: order.status.index,
                           onStatusUpdated: (int newStatus) {
                             onStatusUpdated?.call();

@@ -1,15 +1,19 @@
+import 'package:fans_food_order/services/notification_class.dart';
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'notification_service.dart';
 
 class FirebaseService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const bool _debugMode = true;
+  static const String _usersCollection = 'customers';
+  static const String _deliveryUsersCollection = 'deliveryUsers';
+  static const String _fcmTokenField = 'fcmToken';
 
   static bool _isIOS() => defaultTargetPlatform == TargetPlatform.iOS;
 
@@ -20,8 +24,9 @@ class FirebaseService {
       appleProvider: AppleProvider.appAttest,
     );
 
-    await _requestNotificationPermission();
-    await NotificationService.initialize();
+    await NotificationServiceClass().initMessaging();
+
+
   }
 
   /// Initialize messaging and update FCM token in nested shops collection
@@ -201,5 +206,72 @@ class FirebaseService {
       _log('Error updating order status: $e', isError: true);
       return false;
     }
+  }
+
+  /// Get FCM token for a user
+  static Future<String?> getUserFcmToken(String userId) async {
+    try {
+      final doc = await _firestore.collection(_usersCollection).doc(userId).get();
+      if (doc.exists) {
+        return doc.data()?[_fcmTokenField] as String?;
+      }
+      _log('User document not found for ID: $userId', isError: true);
+      return null;
+    } catch (e) {
+      _log('Error getting user FCM token: $e', isError: true);
+      return null;
+    }
+  }
+
+  /// Get FCM token for a delivery user
+  static Future<String?> getDeliveryUserFcmToken(String deliveryUserId) async {
+    try {
+      final doc = await _firestore.collection(_deliveryUsersCollection).doc(deliveryUserId).get();
+      if (doc.exists) {
+        return doc.data()?[_fcmTokenField] as String?;
+      }
+      _log('Delivery user document not found for ID: $deliveryUserId', isError: true);
+      return null;
+    } catch (e) {
+      _log('Error getting delivery user FCM token: $e', isError: true);
+      return null;
+    }
+  }
+
+  /// Get both user and delivery user FCM tokens
+  static Future<Map<String, String?>> getOrderUserFcmTokens({
+    required String userId,
+    required String? deliveryUserId,
+  }) async {
+    final tokens = {
+      'userToken': null as String?,
+      'deliveryUserToken': null as String?,
+    };
+
+    try {
+      _log('Fetching FCM tokens for user: $userId');
+      if (deliveryUserId != null) {
+        _log('Delivery user ID provided: $deliveryUserId');
+      }
+
+      // Get user token
+      final userToken = await getUserFcmToken(userId);
+      tokens['userToken'] = userToken;
+      _log('User FCM token: ${userToken ?? 'Not found'}');
+
+      // Get delivery user token if deliveryUserId is provided
+      if (deliveryUserId != null && deliveryUserId.isNotEmpty) {
+        final deliveryToken = await getDeliveryUserFcmToken(deliveryUserId);
+        tokens['deliveryUserToken'] = deliveryToken;
+        _log('Delivery user FCM token: ${deliveryToken ?? 'Not found'}');
+      } else {
+        _log('No delivery user ID provided, skipping delivery user token fetch');
+      }
+    } catch (e) {
+      _log('Error getting order user FCM tokens: $e', isError: true);
+    }
+
+    _log('Final tokens: $tokens');
+    return tokens;
   }
 }
