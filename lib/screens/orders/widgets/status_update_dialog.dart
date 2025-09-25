@@ -38,7 +38,8 @@ class StatusUpdateDialog extends StatelessWidget {
           Text(Translate.get('select_new_status_prompt')),
           const SizedBox(height: 16),
           ...statuses.map((status) {
-            final isCurrent = status.name == currentStatus;
+            // Fix comparison: compare indices, not names
+            final isCurrent = status.index == currentStatus;
             return ListTile(
               leading: Radio<int>(
                 value: status.index,
@@ -94,71 +95,96 @@ class StatusUpdateDialog extends StatelessWidget {
                         );
 
                         if (confirmed == true) {
-                          if (status != OrderStatus.delivering) {
-                            final success =
-                                await FirebaseService.updateOrderStatus(
-                                  orderId: orderModel.orderId,
-                                  newStatus: status.index,
-                                );
-                          }
+                          try {
+                            bool updateOk = true;
+                            if (status != OrderStatus.delivering) {
+                              updateOk = await FirebaseService.updateOrderStatus(
+                                orderId: orderModel.orderId,
+                                newStatus: status.index,
+                              );
+                            }
 
-                          if (context.mounted) {
+                            if (!context.mounted) return;
                             Navigator.pop(context); // Close the dialog
+
+                            if (!updateOk && status != OrderStatus.delivering) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    Translate.get('failed_to_update_order_status'),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
 
                             // If status set to delivering, auto-assign nearest delivery user
                             if (status == OrderStatus.delivering) {
-                              // Use INSTANT device location for assignment (as requested)
-                              final String? assignedUserId =
-                                  await DeliveryAssignmentService.assignNearestDeliveryUserFromCurrentLocation(
-                                    orderId: orderModel.orderId,
-                                  );
+                              try {
+                                // Use INSTANT device location for assignment (as requested)
+                                final String? assignedUserId = await DeliveryAssignmentService
+                                    .assignNearestDeliveryUserFromCurrentLocation(
+                                  orderId: orderModel.orderId,
+                                );
 
-                              if (context.mounted) {
+                                if (!context.mounted) return;
                                 if (assignedUserId != null) {
                                   onStatusUpdated(status.index);
-                                  final tokens =
-                                      await FirebaseService.getOrderUserFcmTokens(
-                                        userId: orderModel.userInfo['userId'],
-                                        deliveryUserId: assignedUserId,
+
+                                  // Fetch tokens (user and delivery)
+                                  final tokens = await FirebaseService.getOrderUserFcmTokens(
+                                    userId: orderModel.userInfo['userId'],
+                                    deliveryUserId: assignedUserId,
+                                  );
+
+                                  // Fallback to token stored in order's userInfo if available
+                                  tokens['userToken'] = tokens['userToken'] ??
+                                      (orderModel.userInfo['fcmToken'] as String?);
+
+                                  // Send notification to user (try/catch to avoid crash)
+                                  try {
+                                    final userToken = tokens['userToken'];
+                                    if (userToken != null && userToken.isNotEmpty) {
+                                      await NotificationServiceClass().sendNotification(
+                                        userToken,
+                                        Translate.get('notification_order_update_title'),
+                                        Translate.get('notification_order_update_body')
+                                            .replaceAll('{status}', status.toTranslatedString()),
                                       );
+                                    }
+                                  } catch (_) {
 
-
-                                  // Send notification to user
-                                  if (tokens['userToken'] != null) {
-                                    await NotificationServiceClass()
-                                        .sendNotification(
-                                          tokens['userToken']!,
-                                          'Order Update',
-                                          'Your order status has been updated to ${status.toTranslatedString()}',
-                                        );
                                   }
 
-                                  // Send notification to delivery user
-                                  if (tokens['deliveryUserToken'] != null) {
-                                    await NotificationServiceClass()
-                                        .sendNotification(
-                                          tokens['deliveryUserToken']!,
-                                          'Order Assigned',
-                                          'You have a new delivery order #${orderModel.orderCode}',
-                                        );
+                                  // Send notification to delivery user (try/catch to avoid crash)
+                                  try {
+                                    final deliveryToken = tokens['deliveryUserToken'];
+                                    if (deliveryToken != null && deliveryToken.isNotEmpty) {
+                                      await NotificationServiceClass().sendNotification(
+                                        deliveryToken,
+                                        Translate.get('notification_order_assigned_title'),
+                                        Translate.get('notification_order_assigned_body')
+                                            .replaceAll('{orderCode}', orderModel.orderCode),
+                                      );
+                                    }
+                                  } catch (_) {
+                                    
                                   }
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        '${Translate.get('order_status_updated_to').replaceAll('{status}', status.toTranslatedString())} • Assigned: $assignedUserId',
+                                        '${Translate.get('order_status_updated_to').replaceAll('{status}', status.toTranslatedString())} • ${Translate.get('assigned_to_user').replaceAll('{userId}', assignedUserId)}',
                                       ),
-                                      backgroundColor:
-                                          theme.colorScheme.primary,
+                                      backgroundColor: theme.colorScheme.primary,
                                     ),
                                   );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        Translate.get(
-                                          'auto_assign_delivery_failed',
-                                        ),
+                                        Translate.get('auto_assign_delivery_failed'),
                                       ),
                                       action: SnackBarAction(
                                         label: Translate.get('settings'),
@@ -169,31 +195,32 @@ class StatusUpdateDialog extends StatelessWidget {
                                     ),
                                   );
                                 }
+                              } catch (e) {
+                                // Avoid crash on assignment errors
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(Translate.get('auto_assign_delivery_failed')),
+                                  ),
+                                );
                               }
                             } else {
+                              // Non-delivering status success
+                              onStatusUpdated(status.index);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    Translate.get(
-                                      'order_status_updated_to',
-                                    ).replaceAll(
-                                      '{status}',
-                                      status.toTranslatedString(),
-                                    ),
+                                    Translate.get('order_status_updated_to')
+                                        .replaceAll('{status}', status.toTranslatedString()),
                                   ),
-
                                   backgroundColor: theme.colorScheme.primary,
                                 ),
                               );
                             }
-                          } else {
+                          } catch (e) {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  Translate.get(
-                                    'failed_to_update_order_status',
-                                  ),
-                                ),
+                                content: Text(Translate.get('something_went_wrong')),
                                 backgroundColor: Colors.red,
                               ),
                             );

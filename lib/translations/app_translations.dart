@@ -727,6 +727,13 @@ class AppTranslations {
       'order_status_updated_to': 'Order status updated to {status}',
       'failed_to_update_order_status': 'Failed to update order status',
       'auto_assign_delivery_failed': 'Unable to assign delivery automatically. Enable location or add a driver manually.',
+      // Notifications and misc
+      'notification_order_update_title': 'Order Update',
+      'notification_order_update_body': 'Your order status has been updated to {status}',
+      'notification_order_assigned_title': 'Order Assigned',
+      'notification_order_assigned_body': 'You have a new delivery order #{orderCode}',
+      'assigned_to_user': 'Assigned: {userId}',
+      'something_went_wrong': 'Something went wrong. Please try again.',
     },
 
     'he': {
@@ -766,6 +773,13 @@ class AppTranslations {
       'order_status_updated_to': 'סטטוס ההזמנה עודכן ל-{status}',
       'failed_to_update_order_status': 'עדכון סטטוס ההזמנה נכשל',
       'auto_assign_delivery_failed': 'לא ניתן להקצות שליח באופן אוטומטי. אפשר מיקום או הוסף שליח ידנית.',
+      // Notifications and misc (HE)
+      'notification_order_update_title': 'עדכון הזמנה',
+      'notification_order_update_body': 'סטטוס ההזמנה שלך עודכן ל-{status}',
+      'notification_order_assigned_title': 'הוקצתה הזמנה',
+      'notification_order_assigned_body': 'הוקצתה לך הזמנת משלוח חדשה #{orderCode}',
+      'assigned_to_user': 'הוקצה: {userId}',
+      'something_went_wrong': 'משהו השתבש. נסה שוב.',
 
       'entranceLabel': 'שער',
       'entranceHint': 'הכנס מספר/שם שער',
