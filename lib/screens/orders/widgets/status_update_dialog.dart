@@ -119,7 +119,6 @@ class StatusUpdateDialog extends StatelessWidget {
                                   final tokens =
                                       await FirebaseService.getOrderUserFcmTokens(
                                         userId: orderModel.userInfo['userId'],
-                                        // Assuming user ID is stored here
                                         deliveryUserId: assignedUserId,
                                       );
 
