@@ -16,17 +16,22 @@ import 'screens/home/home_screen.dart';
 
 @pragma('vm:entry-point')
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await Hive.initFlutter();
 
   await Hive.openBox('myBox');
+  
   // Initialize Firebase Core
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize Firebase services (App Check and FCM)
   await FirebaseService.initialize();
 
+
   runApp(const MyApp());
+
 }
 
 class MyApp extends StatelessWidget {

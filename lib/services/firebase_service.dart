@@ -38,6 +38,10 @@ class FirebaseService {
       _log('Initializing FCM for shop: $shopId in stadium: $stadiumId');
 
       String? token = await _getFCMToken();
+         
+
+         print("fcm token: $token");
+
       if (token != null) {
         await _updateShopFCMToken(stadiumId, shopId, token);
       }

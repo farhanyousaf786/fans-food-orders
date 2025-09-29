@@ -179,6 +179,10 @@ class AuthProvider with ChangeNotifier {
         password: password,
       );
 
+     
+      
+      
+      
       if (userCredential.user != null) {
         await _loadUserData(userCredential.user!.uid);
       }
