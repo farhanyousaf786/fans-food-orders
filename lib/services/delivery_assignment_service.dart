@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fans_food_order/models/order_status.dart';
 import 'package:geolocator/geolocator.dart';
@@ -102,8 +103,6 @@ class DeliveryAssignmentService {
     required double orderLongitude,
   }) async {
     try {
-
-
       debugPrint(
         '📍 Order location: Lat ${orderLatitude.toStringAsFixed(6)}, Lng ${orderLongitude.toStringAsFixed(6)}',
       );
@@ -154,14 +153,73 @@ class DeliveryAssignmentService {
         );
         return nearestUserId;
       } else {
-        debugPrint('❌ No nearest delivery user found to assign for order $orderId');
+        debugPrint(
+          '❌ No nearest delivery user found to assign for order $orderId',
+        );
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error assigning delivery user: $e');
+      return null;
+    }
+  }
+
+  static Future<String?> assignDeliveryUserBySection({
+    required String orderId,
+    required String sectionId,
+  }) async {
+    try {
+      final eligibleUsers =
+          await _firestore
+              .collection('deliveryUsers')
+              .where('isActive', isEqualTo: true)
+              .where('userAvailability', isEqualTo: true)
+              .where('sections', arrayContains: sectionId)
+              .get();
+
+      if (eligibleUsers.docs.isEmpty) {
         return null;
       }
 
+      final docs = eligibleUsers.docs;
+      final deliveryUserId = docs[Random().nextInt(docs.length)].id;
 
+      await _firestore.collection('orders').doc(orderId).update({
+        'deliveryUserId': deliveryUserId,
+        'status': OrderStatus.delivering.index,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 
+      return deliveryUserId;
     } catch (e) {
-      debugPrint('Error assigning delivery user: $e');
+      debugPrint('Error assigning delivery user by section: $e');
+      return null;
+    }
+  }
+
+  static Future<String?> getSectionID({
+    required String sectionName,
+    required String stadiumId,
+  }) async {
+    try {
+      final eligibleUsers =
+          await _firestore
+              .collection('stadiums')
+              .doc(stadiumId)
+              .collection('sections')
+              .where('sectionName', isEqualTo: sectionName)
+              .get();
+
+      if (eligibleUsers.docs.isEmpty) {
+        return null;
+      }
+
+      final docs = eligibleUsers.docs;
+      final data = docs.first.data();
+      final sectionId = data['sectionId'] as String?;
+      return sectionId;
+    } catch (e) {
+      debugPrint('Error to get section id: $e');
       return null;
     }
   }
@@ -199,14 +257,11 @@ class DeliveryAssignmentService {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-
       return await getNearestDeliveryUser(
         orderId: orderId,
         orderLatitude: position.latitude,
         orderLongitude: position.longitude,
       );
-
-
     } catch (e) {
       debugPrint('Error getting current location for delivery assignment: $e');
       return null;

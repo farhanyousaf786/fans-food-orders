@@ -123,9 +123,25 @@ class StatusUpdateDialog extends StatelessWidget {
                             if (status == OrderStatus.delivering) {
                               try {
                                 // Use INSTANT device location for assignment (as requested)
-                                final String? assignedUserId = await DeliveryAssignmentService
-                                    .assignNearestDeliveryUserFromCurrentLocation(
+
+
+
+
+                                final seatSectionId = orderModel.seatInfo['sectionId']?.toString();
+                                String? sectionIdToUse = seatSectionId;
+                                if (sectionIdToUse == null || sectionIdToUse.isEmpty) {
+                                  final sectionName = orderModel.seatInfo['section']?.toString() ?? '';
+                                  if (sectionName.isNotEmpty) {
+                                    sectionIdToUse = await DeliveryAssignmentService.getSectionID(
+                                      sectionName: sectionName,
+                                      stadiumId: orderModel.stadiumId,
+                                    );
+                                  }
+                                }
+
+                                final String? assignedUserId = await DeliveryAssignmentService.assignDeliveryUserBySection(
                                   orderId: orderModel.orderId,
+                                  sectionId: sectionIdToUse ?? '',
                                 );
 
                                 if (!context.mounted) return;
