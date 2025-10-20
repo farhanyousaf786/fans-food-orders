@@ -181,12 +181,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDeliveryInfoRow(Icons.area_chart, Translate.get('area'),
-                            order.seatInfo['area'] ?? '-'),
-                        const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.door_front_door,
-                            Translate.get('entrance'), order.seatInfo['entrance'] ?? '-'),
-                        const SizedBox(height: 8),
+
                         _buildDeliveryInfoRow(Icons.view_stream, Translate.get('row'),
                             order.seatInfo['row'] ?? '-'),
                         const SizedBox(height: 8),

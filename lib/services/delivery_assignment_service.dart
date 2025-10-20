@@ -169,30 +169,37 @@ class DeliveryAssignmentService {
     required String sectionId,
   }) async {
     try {
+      debugPrint('[assignDeliveryUserBySection] start orderId=$orderId sectionId=$sectionId');
       final eligibleUsers =
           await _firestore
               .collection('deliveryUsers')
               .where('isActive', isEqualTo: true)
-              .where('userAvailability', isEqualTo: true)
-              .where('sections', arrayContains: sectionId)
+              // .where('userAvailability', isEqualTo: true)
+              .where('sectionIds', arrayContains: sectionId)
               .get();
 
+      debugPrint('[assignDeliveryUserBySection] eligible users found: ${eligibleUsers.docs.length}');
+
       if (eligibleUsers.docs.isEmpty) {
+        debugPrint('[assignDeliveryUserBySection] no eligible users for sectionId=$sectionId');
         return null;
       }
 
       final docs = eligibleUsers.docs;
       final deliveryUserId = docs[Random().nextInt(docs.length)].id;
+      debugPrint('[assignDeliveryUserBySection] selected deliveryUserId=$deliveryUserId');
 
+      debugPrint('[assignDeliveryUserBySection] updating order $orderId with deliveryUserId');
       await _firestore.collection('orders').doc(orderId).update({
         'deliveryUserId': deliveryUserId,
         'status': OrderStatus.delivering.index,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+      debugPrint('[assignDeliveryUserBySection] order $orderId updated successfully');
 
       return deliveryUserId;
     } catch (e) {
-      debugPrint('Error assigning delivery user by section: $e');
+      debugPrint('[assignDeliveryUserBySection] error: $e');
       return null;
     }
   }

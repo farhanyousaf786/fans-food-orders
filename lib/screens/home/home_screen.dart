@@ -503,7 +503,7 @@ class _NewOrderDialog extends StatelessWidget {
           _buildOrderInfo(
             icon: Icons.attach_money,
             label: Translate.get('total_amount'),
-            value: '\$${order.total.toStringAsFixed(2)}',
+            value: '₪${order.total.toStringAsFixed(2)}',
             theme: theme,
           ),
           const SizedBox(height: 12),

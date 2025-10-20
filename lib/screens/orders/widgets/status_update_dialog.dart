@@ -140,7 +140,7 @@ class StatusUpdateDialog extends StatelessWidget {
                                 }
 
                                 final String? assignedUserId = await DeliveryAssignmentService.assignDeliveryUserBySection(
-                                  orderId: orderModel.orderId,
+                                  orderId: orderModel.id,
                                   sectionId: sectionIdToUse ?? '',
                                 );
 
