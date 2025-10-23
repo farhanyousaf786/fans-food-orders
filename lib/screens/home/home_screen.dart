@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/order/order_bloc.dart';
 import '../../models/order.dart';
@@ -76,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Show dialogue for each new order
     for (final newOrder in newOrders) {
+      SystemSound.play(SystemSoundType.click);
       _showNewOrderDialog(newOrder);
     }
 

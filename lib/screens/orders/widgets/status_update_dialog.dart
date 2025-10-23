@@ -99,7 +99,7 @@ class StatusUpdateDialog extends StatelessWidget {
                             bool updateOk = true;
                             if (status != OrderStatus.delivering) {
                               updateOk = await FirebaseService.updateOrderStatus(
-                                orderId: orderModel.orderId,
+                                orderId: orderModel.id,
                                 newStatus: status.index,
                               );
                             }
