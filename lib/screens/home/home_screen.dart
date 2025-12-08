@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/order/order_bloc.dart';
 import '../../models/order.dart';
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Show dialogue for each new order
     for (final newOrder in newOrders) {
-      SystemSound.play(SystemSoundType.click);
+     
       _showNewOrderDialog(newOrder);
     }
 
@@ -85,11 +86,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showNewOrderDialog(OrderModel order) {
+    _playNotificationSound();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => _NewOrderDialog(order: order),
     );
+  }
+
+  Future<void> _playNotificationSound() async {
+    try {
+      final player = AudioPlayer();
+      await player.play(AssetSource('sounds/notify.mp3'));
+      print('Error playing sound: play...');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
 
   @override
@@ -145,7 +157,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildLanguageSwitcher(context),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _showLogoutConfirmation(context, authProvider),
+            onPressed: () =>
+
+                 _showLogoutConfirmation(context, authProvider),
             tooltip: Translate.get('sign_out'),
           ),
         ],
