@@ -10,6 +10,7 @@ import '../../../models/order.dart';
 import '../../../models/order_status.dart';
 import '../../../widgets/app_colors.dart';
 import '../screens/order_details_screen.dart';
+import '../../../utils/currency_helper.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -68,7 +69,7 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '${Translate.get('items_count').replaceAll('{count}', order.cart.length.toString())} • ${_formatPrice(order.total)}',
+                '${Translate.get('items_count').replaceAll('{count}', order.cart.length.toString())} • ${_formatPrice(order.total,order.cart.first.currency)}',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -85,7 +86,9 @@ class OrderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${order.seatInfo['section'] ?? Translate.get('section')} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seatNo'] ?? ''}',
+                        '${order.seatInfo['section'] ?? Translate.get('section')} ${order.seatInfo['row'] ?? ''} • ${order.seatInfo['seatNo'] ?? ''}'
+                        '${order.seatInfo['floor'] != null ? ' • ${Translate.get('floor')}: ${order.seatInfo['floor']}' : ''}'
+                        '${order.seatInfo['room'] != null ? ' • ${Translate.get('room')}: ${order.seatInfo['room']}' : ''}',
                         style: theme.textTheme.bodySmall,
                       ),
                     ],
@@ -176,7 +179,7 @@ class OrderCard extends StatelessWidget {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  String _formatPrice(double amount) {
-    return '₪${amount.toStringAsFixed(2)}';
+  String _formatPrice(double amount, String currency) {
+    return '${CurrencyHelper.getSymbol(currency)}${amount.toStringAsFixed(2)}';
   }
 }

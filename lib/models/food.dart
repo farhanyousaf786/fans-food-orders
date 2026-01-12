@@ -12,6 +12,7 @@ class Food extends Equatable {
   final DateTime createdAt;
   final Map<String, dynamic> customization;
   final String description;
+  final String currency;
   final Map<String, String> descriptionMap;
   final List<Map<String, dynamic>> extras;
   final List<String> images;
@@ -39,6 +40,7 @@ class Food extends Equatable {
     required this.createdAt,
     required this.customization,
     required this.description,
+    required this.currency,
     this.descriptionMap = const {},
     required this.extras,
     required this.images,
@@ -66,6 +68,7 @@ class Food extends Equatable {
               .toList() ??
           [],
       category: map['category'] ?? '',
+      currency: map['currency'] ?? '',
       categoryMap: (map['categoryMap'] as Map<String, dynamic>?)
               ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
           {},

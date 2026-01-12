@@ -403,6 +403,7 @@ class AppTranslations {
       'noShopsAvailable': 'No shops available in this stadium',
 
       'floor': 'Floor',
+      'room': 'Room',
 
       'gate': 'Gate',
 
@@ -726,7 +727,7 @@ class AppTranslations {
       'close_button': 'CLOSE',
       'order_status_updated_to': 'Order status updated to {status}',
       'failed_to_update_order_status': 'Failed to update order status',
-      'auto_assign_delivery_failed': 'Unable to assign delivery automatically. Enable location or add a driver manually.',
+      'auto_assign_delivery_failed': 'Unable to assign delivery May be they buys in delivering orders',
       // Notifications and misc
       'notification_order_update_title': 'Order Update',
       'notification_order_update_body': 'Your order status has been updated to {status}',
@@ -772,7 +773,7 @@ class AppTranslations {
       'close_button': 'סגור',
       'order_status_updated_to': 'סטטוס ההזמנה עודכן ל-{status}',
       'failed_to_update_order_status': 'עדכון סטטוס ההזמנה נכשל',
-      'auto_assign_delivery_failed': 'לא ניתן להקצות שליח באופן אוטומטי. אפשר מיקום או הוסף שליח ידנית.',
+      'auto_assign_delivery_failed': 'לא ניתן להקצות משלוח יכול להיות שהם קונים במשלוח הזמנות',
       // Notifications and misc (HE)
       'notification_order_update_title': 'עדכון הזמנה',
       'notification_order_update_body': 'סטטוס ההזמנה שלך עודכן ל-{status}',
@@ -1195,6 +1196,7 @@ class AppTranslations {
       'noShopsAvailable': 'אין חנויות זמינות באצטדיון זה',
 
       'floor': 'קומה',
+      'room': 'חדר',
 
       'gate': 'שער',
 

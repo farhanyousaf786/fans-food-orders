@@ -12,6 +12,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/order/order_bloc.dart';
 import '../../models/order.dart';
+import '../../utils/currency_helper.dart';
 import '../auth/sign_in_screen.dart';
 import '../../models/shop_model.dart';
 import '../shop/shop_detail_screen.dart';
@@ -519,14 +520,16 @@ class _NewOrderDialog extends StatelessWidget {
           _buildOrderInfo(
             icon: Icons.attach_money,
             label: Translate.get('total_amount'),
-            value: '₪${order.total.toStringAsFixed(2)}',
+            value: '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.total.toStringAsFixed(2)}',
             theme: theme,
           ),
           const SizedBox(height: 12),
           _buildOrderInfo(
             icon: Icons.event_seat,
             label: Translate.get('seat_info'),
-            value: ' ${Translate.get('row')}: ${order.seatInfo['row'] ?? 'N/A'}, ${Translate.get('seat')}: ${order.seatInfo['seatNo'] ?? 'N/A'}',
+            value: ' ${Translate.get('row')}: ${order.seatInfo['row'] ?? 'N/A'}, ${Translate.get('seat')}: ${order.seatInfo['seatNo'] ?? 'N/A'}'
+                '${order.seatInfo['floor'] != null ? ', ${Translate.get('floor')}: ${order.seatInfo['floor']}' : ''}'
+                '${order.seatInfo['room'] != null ? ', ${Translate.get('room')}: ${order.seatInfo['room']}' : ''}',
             theme: theme,
           ),
           const SizedBox(height: 16),

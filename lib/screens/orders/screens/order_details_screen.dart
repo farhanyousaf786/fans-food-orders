@@ -5,6 +5,7 @@ import '../../../models/order.dart';
 
 import '../../../models/order_status.dart';
 import '../../../translations/language_service.dart';
+import '../../../utils/currency_helper.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
@@ -84,7 +85,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '₪${item.price.toStringAsFixed(2)}',
+                          '${CurrencyHelper.getSymbol(item.currency)}${item.price.toStringAsFixed(2)}',
                           style: theme.textTheme.titleMedium,
                         ),
                         Text('${Translate.get('quantity')}: ${item.quantity}'),
@@ -110,12 +111,12 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     _buildSummaryRow(
-                        Translate.get('subtotal'), '₪${order.subtotal.toStringAsFixed(2)}'),
+                        Translate.get('subtotal'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.subtotal.toStringAsFixed(2)}'),
                     if (order.tipAmount > 0)
-                      _buildSummaryRow(Translate.get('tip'), '₪${order.tipAmount.toStringAsFixed(2)}'),
+                      _buildSummaryRow(Translate.get('tip'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.tipAmount.toStringAsFixed(2)}'),
                     if (order.deliveryFee > 0)
-                      _buildSummaryRow(Translate.get('handlingAndDelivery'), '₪${order.deliveryFee.toStringAsFixed(2)}'),
-                    _buildSummaryRow(Translate.get('total'), '₪${order.total.toStringAsFixed(2)}',
+                      _buildSummaryRow(Translate.get('handlingAndDelivery'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.deliveryFee.toStringAsFixed(2)}'),
+                    _buildSummaryRow(Translate.get('total'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.total.toStringAsFixed(2)}',
                         isTotal: true),
                   ],
                 ),
@@ -182,19 +183,59 @@ class OrderDetailsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        _buildDeliveryInfoRow(Icons.view_stream, Translate.get('row'),
-                            order.seatInfo['row'] ?? '-'),
-                        const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.event_seat, Translate.get('seat_no'),
-                            order.seatInfo['seatNo'] ?? '-'),
+                        // Row
+                        if (order.seatInfo['row'] != null && 
+                            order.seatInfo['row'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(Icons.view_stream, Translate.get('row'),
+                              order.seatInfo['row'].toString()),
+                        ],
 
+                        // Seat No
+                        if (order.seatInfo['seatNo'] != null && 
+                            order.seatInfo['seatNo'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(Icons.event_seat, Translate.get('seat_no'),
+                              order.seatInfo['seatNo'].toString()),
+                        ],
 
-                        const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.grid_view, Translate.get('section'),
-                            order.seatInfo['section'] ?? '-'),
-                        const SizedBox(height: 8),
-                        _buildDeliveryInfoRow(Icons.stadium, Translate.get('stand'),
-                            order.seatInfo['stand'] ?? '-'),
+                        // Section
+                        if (order.seatInfo['section'] != null && 
+                            order.seatInfo['section'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(Icons.grid_view, Translate.get('section'),
+                              order.seatInfo['section'].toString()),
+                        ],
+
+                        // Stand
+                        if (order.seatInfo['stand'] != null && 
+                            order.seatInfo['stand'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(Icons.stadium, Translate.get('stand'),
+                              order.seatInfo['stand'].toString()),
+                        ],
+                        
+                        // Floor
+                        if (order.seatInfo['floor'] != null && 
+                            order.seatInfo['floor'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(
+                            Icons.layers, 
+                            Translate.get('floor'),
+                            order.seatInfo['floor'].toString()
+                          ),
+                        ],
+
+                        // Room
+                        if (order.seatInfo['room'] != null && 
+                            order.seatInfo['room'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildDeliveryInfoRow(
+                            Icons.meeting_room, 
+                            Translate.get('room'),
+                            order.seatInfo['room'].toString()
+                          ),
+                        ],
                       ],
                     ),
                   ],

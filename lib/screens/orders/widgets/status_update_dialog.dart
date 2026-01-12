@@ -124,24 +124,21 @@ class StatusUpdateDialog extends StatelessWidget {
                               try {
                                 // Use INSTANT device location for assignment (as requested)
 
+                                // final seatSectionId = orderModel.seatInfo['sectionId']?.toString();
+                                // String? sectionIdToUse = seatSectionId;
+                                // if (sectionIdToUse == null || sectionIdToUse.isEmpty) {
+                                //   final sectionName = orderModel.seatInfo['section']?.toString() ?? '';
+                                //   if (sectionName.isNotEmpty) {
+                                //     sectionIdToUse = await DeliveryAssignmentService.getSectionID(
+                                //       sectionName: sectionName,
+                                //       stadiumId: orderModel.stadiumId,
+                                //     );
+                                //   }
+                                // }
 
-
-
-                                final seatSectionId = orderModel.seatInfo['sectionId']?.toString();
-                                String? sectionIdToUse = seatSectionId;
-                                if (sectionIdToUse == null || sectionIdToUse.isEmpty) {
-                                  final sectionName = orderModel.seatInfo['section']?.toString() ?? '';
-                                  if (sectionName.isNotEmpty) {
-                                    sectionIdToUse = await DeliveryAssignmentService.getSectionID(
-                                      sectionName: sectionName,
-                                      stadiumId: orderModel.stadiumId,
-                                    );
-                                  }
-                                }
-
-                                final String? assignedUserId = await DeliveryAssignmentService.assignDeliveryUserBySection(
+                                final String? assignedUserId = await DeliveryAssignmentService.assignDeliveryUserByShop(
                                   orderId: orderModel.id,
-                                  sectionId: sectionIdToUse ?? '',
+                                  shopId: orderModel.shopId,
                                 );
 
                                 if (!context.mounted) return;
@@ -202,12 +199,7 @@ class StatusUpdateDialog extends StatelessWidget {
                                       content: Text(
                                         Translate.get('auto_assign_delivery_failed'),
                                       ),
-                                      action: SnackBarAction(
-                                        label: Translate.get('settings'),
-                                        onPressed: () {
-                                          Geolocator.openAppSettings();
-                                        },
-                                      ),
+
                                     ),
                                   );
                                 }
