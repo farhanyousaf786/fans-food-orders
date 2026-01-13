@@ -1,6 +1,7 @@
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../models/order.dart';
 
 import '../../../models/order_status.dart';
@@ -184,7 +185,48 @@ class OrderDetailsScreen extends StatelessWidget {
             // Seat Information OR Pickup Information
             const SizedBox(height: 20),
             if (order.deliveryMethod == 'pickup' && order.pickupPointId != null)
-              _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme)
+              Column(
+                children: [
+                  _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme),
+                 Center(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(top: 10,bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.6)),
+                        boxShadow: [BoxShadow(
+                          color: const Color(0xFF5A6CEA).withOpacity(0.07),
+                          spreadRadius: 0,
+                          blurRadius: 50,
+                          offset: const Offset(
+                            0,
+                            3,
+                          ),
+                        )],
+                      ),
+                      child: QrImageView(
+                        data: order.orderCode,
+                        version: QrVersions.auto,
+                        size: 160,
+                        backgroundColor: Colors.transparent,
+                        eyeStyle: const QrEyeStyle(
+                          color: AppColors.primaryDarkColor,
+                          eyeShape: QrEyeShape.square,
+                        ),
+                        dataModuleStyle: const QrDataModuleStyle(
+                          color: AppColors.primaryDarkColor,
+                          dataModuleShape: QrDataModuleShape.square,
+                        ),
+                      ),
+                    ),
+                  )
+
+                ],
+              )
             else
               Card(
                 color: Colors.white,
