@@ -1,3 +1,4 @@
+import 'package:fans_food_order/screens/orders/screens/qr_scan_screen.dart';
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -5,10 +6,13 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../models/order.dart';
 
 import '../../../models/order_status.dart';
+import '../../../services/firebase_service.dart';
 import '../../../translations/language_service.dart';
 import '../../../utils/currency_helper.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../../utils/custom_text_style.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
@@ -188,38 +192,55 @@ class OrderDetailsScreen extends StatelessWidget {
               Column(
                 children: [
                   _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme),
-                 Center(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.only(top: 10,bottom: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        border: Border.all(
-                            color: Colors.white.withOpacity(0.6)),
-                        boxShadow: [BoxShadow(
-                          color: const Color(0xFF5A6CEA).withOpacity(0.07),
-                          spreadRadius: 0,
-                          blurRadius: 50,
-                          offset: const Offset(
-                            0,
-                            3,
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        if (order.status == OrderStatus.delivered) {
+                          return;
+                        }
+
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const QRScanScreen(),
                           ),
-                        )],
-                      ),
-                      child: QrImageView(
-                        data: order.orderCode,
-                        version: QrVersions.auto,
-                        size: 160,
-                        backgroundColor: Colors.transparent,
-                        eyeStyle: const QrEyeStyle(
-                          color: AppColors.primaryDarkColor,
-                          eyeShape: QrEyeShape.square,
+                        );
+
+                        if (result != null && context.mounted) {
+                          if (result == order.orderCode) {
+                            await FirebaseService.updateOrderStatus(
+                              orderId: order.id,
+                              newStatus: OrderStatus.delivered.index,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  Translate.get('invalid_order_code'),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                        //  _showCompleteOrderBottomSheet(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        dataModuleStyle: const QrDataModuleStyle(
-                          color: AppColors.primaryDarkColor,
-                          dataModuleShape: QrDataModuleShape.square,
+                      ),
+                      icon: const Icon(
+                        Icons.qr_code_scanner,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        Translate.get('complete_delivery'),
+                        style: CustomTextStyle.size16Weight600Text().copyWith(
+                          color: Colors.white,
                         ),
                       ),
                     ),

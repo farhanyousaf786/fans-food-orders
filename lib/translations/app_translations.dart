@@ -681,6 +681,7 @@ class AppTranslations {
       'location': 'Location',
       'coordinates': 'Coordinates',
       'stadiumInformation': 'Venue Information',
+      'complete_delivery': 'Complete Order',
       'stadiumId': 'Venue ID',
       'order_id_prefix': 'Order #',
       'items_count': '{count} items',
@@ -797,6 +798,7 @@ class AppTranslations {
           'ברוכים הבאים לאפליקציית Venue Food. אנו מחויבים להגן על המידע האישי שלך ועל זכותך לפרטיות. מדיניות פרטיות זו מסבירה כיצד אנו אוספים, משתמשים, חושפים ומגנים על המידע שלך בעת השימוש באפליקציה ובשירותים שלנו.',
 
       'privacy_policy_section_2_title': '2. מידע שאנו אוספים',
+      'complete_delivery': 'הזמנה מלאה',
 
       'privacy_policy_section_2_intro':
           'אנו אוספים מידע שאתה מספק לנו ישירות, כולל:',
