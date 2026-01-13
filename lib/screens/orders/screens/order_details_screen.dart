@@ -2,7 +2,7 @@ import 'package:fans_food_order/screens/orders/screens/qr_scan_screen.dart';
 import 'package:fans_food_order/translations/translate.dart';
 import 'package:fans_food_order/widgets/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+
 import '../../../models/order.dart';
 
 import '../../../models/order_status.dart';
@@ -189,10 +189,13 @@ class OrderDetailsScreen extends StatelessWidget {
             // Seat Information OR Pickup Information
             const SizedBox(height: 20),
             if (order.deliveryMethod == 'pickup' && order.pickupPointId != null)
-<<<<<<< Updated upstream
               Column(
                 children: [
-                  _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme),
+                  _buildPickupDetails(
+                    order.stadiumId,
+                    order.pickupPointId!,
+                    theme,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: ElevatedButton.icon(
@@ -229,7 +232,10 @@ class OrderDetailsScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 15),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -245,11 +251,9 @@ class OrderDetailsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  )
-
+                  ),
                 ],
-=======
-              _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme)
+              )
             else if (order.deliveryType == 'inside' &&
                 order.insideDelivery != null)
               _buildExtendedDeliveryDetails(
@@ -263,7 +267,6 @@ class OrderDetailsScreen extends StatelessWidget {
                 Translate.get('outside_delivery'),
                 order.outsideDelivery!,
                 theme,
->>>>>>> Stashed changes
               )
             else
               Card(
