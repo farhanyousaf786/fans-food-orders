@@ -189,6 +189,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // Seat Information OR Pickup Information
             const SizedBox(height: 20),
             if (order.deliveryMethod == 'pickup' && order.pickupPointId != null)
+<<<<<<< Updated upstream
               Column(
                 children: [
                   _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme),
@@ -247,6 +248,22 @@ class OrderDetailsScreen extends StatelessWidget {
                   )
 
                 ],
+=======
+              _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme)
+            else if (order.deliveryType == 'inside' &&
+                order.insideDelivery != null)
+              _buildExtendedDeliveryDetails(
+                Translate.get('inside_delivery'),
+                order.insideDelivery!,
+                theme,
+              )
+            else if (order.deliveryType == 'outside' &&
+                order.outsideDelivery != null)
+              _buildExtendedDeliveryDetails(
+                Translate.get('outside_delivery'),
+                order.outsideDelivery!,
+                theme,
+>>>>>>> Stashed changes
               )
             else
               Card(
@@ -627,6 +644,58 @@ class OrderDetailsScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildExtendedDeliveryDetails(
+    String title,
+    Map<String, dynamic> deliveryData,
+    ThemeData theme,
+  ) {
+    final locationData = deliveryData['location'] as Map<String, dynamic>?;
+
+    return Card(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: theme.textTheme.titleMedium),
+            const SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (locationData != null && locationData['name'] != null)
+                  _buildDeliveryInfoRow(
+                    Icons.location_on,
+                    'Location Name',
+                    locationData['name'].toString(),
+                  ),
+                if (locationData != null && locationData['description'] != null)
+                  _buildDeliveryInfoRow(
+                    Icons.description,
+                    'Description',
+                    locationData['description'].toString(),
+                  ),
+                if (deliveryData['notes'] != null &&
+                    deliveryData['notes'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.note,
+                    'Notes',
+                    deliveryData['notes'].toString(),
+                  ),
+                if (deliveryData['fee'] != null)
+                  _buildDeliveryInfoRow(
+                    Icons.attach_money,
+                    'Extra Fee',
+                    '${deliveryData['currency'] ?? ''} ${deliveryData['fee']}',
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

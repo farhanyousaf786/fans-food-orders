@@ -30,6 +30,14 @@ class OrderModel extends Equatable {
   final String? deliveryMethod;
   final String? pickupPointId;
 
+  // New fields from Web Model
+  final double tipPercentage;
+  final Timestamp? updatedAt;
+  final String platform;
+  final String deliveryType;
+  final Map<String, dynamic>? insideDelivery;
+  final Map<String, dynamic>? outsideDelivery;
+
   OrderModel({
     required this.cart,
     required this.subtotal,
@@ -53,6 +61,12 @@ class OrderModel extends Equatable {
     required this.id,
     this.deliveryMethod,
     this.pickupPointId,
+    this.tipPercentage = 0,
+    this.updatedAt,
+    this.platform = 'App',
+    this.deliveryType = '',
+    this.insideDelivery,
+    this.outsideDelivery,
   });
 
   factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
@@ -84,6 +98,12 @@ class OrderModel extends Equatable {
       id: id,
       deliveryMethod: map['deliveryMethod'] as String?,
       pickupPointId: map['pickupPointId'] as String?,
+      tipPercentage: (map['tipPercentage'] ?? 0) * 1.0,
+      updatedAt: map['updatedAt'] as Timestamp?,
+      platform: map['platform'] ?? 'App',
+      deliveryType: map['deliveryType'] ?? '',
+      insideDelivery: map['insideDelivery'] as Map<String, dynamic>?,
+      outsideDelivery: map['outsideDelivery'] as Map<String, dynamic>?,
     );
   }
 
@@ -117,6 +137,12 @@ class OrderModel extends Equatable {
       'customerLocation': customerLocation,
       'deliveryMethod': deliveryMethod,
       'pickupPointId': pickupPointId,
+      'tipPercentage': tipPercentage,
+      'updatedAt': updatedAt,
+      'platform': platform,
+      'deliveryType': deliveryType,
+      'insideDelivery': insideDelivery,
+      'outsideDelivery': outsideDelivery,
     };
   }
 
@@ -143,5 +169,11 @@ class OrderModel extends Equatable {
     customerLocation,
     deliveryMethod,
     pickupPointId,
+    tipPercentage,
+    updatedAt,
+    platform,
+    deliveryType,
+    insideDelivery,
+    outsideDelivery,
   ];
 }

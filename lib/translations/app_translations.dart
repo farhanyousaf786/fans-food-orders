@@ -712,6 +712,8 @@ class AppTranslations {
       'pickupDetails': 'Pickup Details',
       'pickupLocation': 'Pickup Location',
       'pickupInstructions': 'Instructions',
+      'inside_delivery': 'Inside Delivery',
+      'outside_delivery': 'Outside Delivery',
     },
 
     'he': {
@@ -763,6 +765,8 @@ class AppTranslations {
       'pickupDetails': 'פרטי איסוף',
       'pickupLocation': 'מקום איסוף',
       'pickupInstructions': 'הוראות',
+      'inside_delivery': 'משלוח פנימי',
+      'outside_delivery': 'משלוח חיצוני',
 
       'entranceLabel': 'שער',
       'entranceHint': 'הכנס מספר/שם שער',

@@ -59,6 +59,48 @@ class OrderCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ] else if (order.deliveryType == 'inside') ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.blue),
+                        ),
+                        child: Text(
+                          'INSIDE',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ] else if (order.deliveryType == 'outside') ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.purple.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.purple),
+                        ),
+                        child: Text(
+                          'OUTSIDE',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.purple,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
                     ],
                   ],
                 ),
