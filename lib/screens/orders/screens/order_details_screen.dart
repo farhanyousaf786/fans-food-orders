@@ -189,6 +189,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // Seat Information OR Pickup Information
             const SizedBox(height: 20),
             if (order.deliveryMethod == 'pickup' && order.pickupPointId != null)
+<<<<<<< Updated upstream
               Column(
                 children: [
                   _buildPickupDetails(
@@ -254,6 +255,9 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                 ],
               )
+=======
+              _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme)
+>>>>>>> Stashed changes
             else if (order.deliveryType == 'inside' &&
                 order.insideDelivery != null)
               _buildExtendedDeliveryDetails(
