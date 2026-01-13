@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/language_provider.dart';
 import '../home/home_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -28,18 +29,13 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _handleSignIn(AuthProvider auth) async {
-
-    String? apnsToken = await FirebaseMessaging
-        .instance
-        .getAPNSToken();
+    String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
     print("APNS Token: $apnsToken");
 
     print("FCM Token>>>>>>>>");
     await Future.delayed(Duration(seconds: 1));
-    String? token =
-    await FirebaseMessaging.instance.getToken();
+    String? token = await FirebaseMessaging.instance.getToken();
     print("FCM Token: $token");
-
 
     if (_formKey.currentState?.validate() ?? false) {
       try {
@@ -51,13 +47,11 @@ class _SignInScreenState extends State<SignInScreen> {
         setState(() {
           _errorMessage = null;
         });
-        
+
         // Navigate to home screen after successful login
         if (mounted && auth.isAuthenticated) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         }
       } catch (e) {
@@ -71,6 +65,60 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          // Language Dropdown Menu
+          Consumer<LanguageProvider>(
+            builder: (context, languageProvider, _) {
+              return PopupMenuButton<String>(
+                icon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.language, color: Theme.of(context).primaryColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      languageProvider.appLocale.languageCode.toUpperCase(),
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                onSelected: (String languageCode) {
+                  languageProvider.changeLanguage(Locale(languageCode));
+                },
+                itemBuilder:
+                    (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'en',
+                        child: Row(
+                          children: [
+                            Text('🇺🇸', style: TextStyle(fontSize: 20)),
+                            const SizedBox(width: 12),
+                            const Text('English'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'he',
+                        child: Row(
+                          children: [
+                            Text('🇮🇱', style: TextStyle(fontSize: 20)),
+                            const SizedBox(width: 12),
+                            const Text('עברית'),
+                          ],
+                        ),
+                      ),
+                    ],
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -169,20 +217,24 @@ class _SignInScreenState extends State<SignInScreen> {
                 Consumer<AuthProvider>(
                   builder: (context, auth, _) {
                     return ElevatedButton(
-                      onPressed: auth.isLoading ? null : () => _handleSignIn(auth),
+                      onPressed:
+                          auth.isLoading ? null : () => _handleSignIn(auth),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: auth.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(Translate.get('signInButton')),
+                      child:
+                          auth.isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : Text(Translate.get('signInButton')),
                     );
                   },
                 ),
@@ -191,14 +243,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 // Theme Toggle
                 Consumer<ThemeProvider>(
                   builder: (context, theme, _) {
-                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    final isDark =
+                        Theme.of(context).brightness == Brightness.dark;
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(Translate.get('themeLabel')),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+                          icon: Icon(
+                            isDark ? Icons.light_mode : Icons.dark_mode,
+                          ),
                           onPressed: () => theme.toggleTheme(),
                         ),
                       ],

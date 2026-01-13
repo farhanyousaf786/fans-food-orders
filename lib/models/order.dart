@@ -4,8 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'food.dart';
 import 'order_status.dart';
 
-
-
 class OrderModel extends Equatable {
   final List<Food> cart;
   final double subtotal;
@@ -29,6 +27,9 @@ class OrderModel extends Equatable {
 
   final String id;
 
+  final String? deliveryMethod;
+  final String? pickupPointId;
+
   OrderModel({
     required this.cart,
     required this.subtotal,
@@ -50,6 +51,8 @@ class OrderModel extends Equatable {
     this.location,
     this.customerLocation,
     required this.id,
+    this.deliveryMethod,
+    this.pickupPointId,
   });
 
   factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
@@ -57,7 +60,7 @@ class OrderModel extends Equatable {
       cart: List<Food>.from(
         map['cart']?.map(
               (x) => Food.fromMap(x['id'] as String, x as Map<String, dynamic>),
-        ) ??
+            ) ??
             [],
       ),
       subtotal: (map['subtotal'] ?? 0) * 1.0,
@@ -79,16 +82,19 @@ class OrderModel extends Equatable {
       location: map['location'] as GeoPoint?,
       customerLocation: map['customerLocation'] as GeoPoint?,
       id: id,
+      deliveryMethod: map['deliveryMethod'] as String?,
+      pickupPointId: map['pickupPointId'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'cart': cart.map((x) {
-        var food = x.toMap();
-        food['quantity'] = x.quantity;
-        return food;
-      }).toList(),
+      'cart':
+          cart.map((x) {
+            var food = x.toMap();
+            food['quantity'] = x.quantity;
+            return food;
+          }).toList(),
       'subtotal': subtotal,
       'deliveryFee': deliveryFee,
       'discount': discount,
@@ -109,6 +115,8 @@ class OrderModel extends Equatable {
       'orderCode': orderCode,
       'location': location,
       'customerLocation': customerLocation,
+      'deliveryMethod': deliveryMethod,
+      'pickupPointId': pickupPointId,
     };
   }
 
@@ -133,5 +141,7 @@ class OrderModel extends Equatable {
     orderCode,
     location,
     customerLocation,
+    deliveryMethod,
+    pickupPointId,
   ];
 }

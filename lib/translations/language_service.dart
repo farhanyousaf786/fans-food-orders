@@ -5,7 +5,7 @@ class LanguageService {
   static const String _languageKey = 'language';
 
   static String getCurrentLanguage() {
-    return Hive.box(_boxName).get(_languageKey, defaultValue: 'he');
+    return Hive.box(_boxName).get(_languageKey, defaultValue: 'en');
   }
 
   static void setLanguage(String language) {

@@ -7,6 +7,8 @@ import '../../../models/order_status.dart';
 import '../../../translations/language_service.dart';
 import '../../../utils/currency_helper.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
 
@@ -17,10 +19,17 @@ class OrderDetailsScreen extends StatelessWidget {
     final lang = LanguageService.getCurrentLanguage();
     final theme = Theme.of(context);
 
+    debugPrint('--- Order Details Debug ---');
+    debugPrint('Order ID: ${order.orderId}');
+    debugPrint('Delivery Method: ${order.deliveryMethod}');
+    debugPrint('Pickup Point ID: ${order.pickupPointId}');
+    debugPrint('Stadium ID: ${order.stadiumId}');
+    debugPrint('---------------------------');
+
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: AppBar(
-        title: Text('${Translate.get('order')} #${order.id}'),
+        title: Text('${Translate.get('order')} #${order.orderId}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -31,24 +40,17 @@ class OrderDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // QR Code Section
-
+            // ... (keep QR, status, items, summary, customer info) ...
             const SizedBox(height: 20),
 
             // Order Status Section
-            Text(
-              Translate.get('status'),
-              style: theme.textTheme.titleLarge,
-            ),
+            Text(Translate.get('status'), style: theme.textTheme.titleLarge),
             const SizedBox(height: 10),
             _buildStatusIndicator(order.status, theme),
             const SizedBox(height: 20),
 
             // Order Items Section
-            Text(
-              Translate.get('items'),
-              style: theme.textTheme.titleLarge,
-            ),
+            Text(Translate.get('items'), style: theme.textTheme.titleLarge),
             const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
@@ -60,20 +62,23 @@ class OrderDetailsScreen extends StatelessWidget {
                   color: Colors.white,
                   margin: const EdgeInsets.only(bottom: 10),
                   child: ListTile(
-                    leading: item.images.isNotEmpty
-                        ? Image.network(
-                            item.images[0],
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            width: 60,
-                            height: 60,
-                            color: Colors.grey[200],
-                            child: Icon(Icons.fastfood,
-                                color: Colors.grey[400]),
-                          ),
+                    leading:
+                        item.images.isNotEmpty
+                            ? Image.network(
+                              item.images[0],
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            )
+                            : Container(
+                              width: 60,
+                              height: 60,
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.fastfood,
+                                color: Colors.grey[400],
+                              ),
+                            ),
                     title: Text(item.nameFor(lang)),
                     subtitle: Text(
                       item.descriptionFor(lang),
@@ -111,13 +116,24 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     _buildSummaryRow(
-                        Translate.get('subtotal'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.subtotal.toStringAsFixed(2)}'),
+                      Translate.get('subtotal'),
+                      '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.subtotal.toStringAsFixed(2)}',
+                    ),
                     if (order.tipAmount > 0)
-                      _buildSummaryRow(Translate.get('tip'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.tipAmount.toStringAsFixed(2)}'),
+                      _buildSummaryRow(
+                        Translate.get('tip'),
+                        '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.tipAmount.toStringAsFixed(2)}',
+                      ),
                     if (order.deliveryFee > 0)
-                      _buildSummaryRow(Translate.get('handlingAndDelivery'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.deliveryFee.toStringAsFixed(2)}'),
-                    _buildSummaryRow(Translate.get('total'), '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.total.toStringAsFixed(2)}',
-                        isTotal: true),
+                      _buildSummaryRow(
+                        Translate.get('handlingAndDelivery'),
+                        '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.deliveryFee.toStringAsFixed(2)}',
+                      ),
+                    _buildSummaryRow(
+                      Translate.get('total'),
+                      '${CurrencyHelper.getSymbol(order.cart.first.currency)}${order.total.toStringAsFixed(2)}',
+                      isTotal: true,
+                    ),
                   ],
                 ),
               ),
@@ -165,86 +181,109 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
             ),
 
-            // Seat Information
+            // Seat Information OR Pickup Information
             const SizedBox(height: 20),
-            Card(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      Translate.get('delivery_information'),
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+            if (order.deliveryMethod == 'pickup' && order.pickupPointId != null)
+              _buildPickupDetails(order.stadiumId, order.pickupPointId!, theme)
+            else
+              Card(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Translate.get('delivery_information'),
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Row
+                          if (order.seatInfo['row'] != null &&
+                              order.seatInfo['row'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.view_stream,
+                              Translate.get('row'),
+                              order.seatInfo['row'].toString(),
+                            ),
+                          ],
 
-                        // Row
-                        if (order.seatInfo['row'] != null && 
-                            order.seatInfo['row'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(Icons.view_stream, Translate.get('row'),
-                              order.seatInfo['row'].toString()),
-                        ],
+                          // Seat No
+                          if (order.seatInfo['seatNo'] != null &&
+                              order.seatInfo['seatNo']
+                                  .toString()
+                                  .isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.event_seat,
+                              Translate.get('seat_no'),
+                              order.seatInfo['seatNo'].toString(),
+                            ),
+                          ],
 
-                        // Seat No
-                        if (order.seatInfo['seatNo'] != null && 
-                            order.seatInfo['seatNo'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(Icons.event_seat, Translate.get('seat_no'),
-                              order.seatInfo['seatNo'].toString()),
-                        ],
+                          // Section
+                          if (order.seatInfo['section'] != null &&
+                              order.seatInfo['section']
+                                  .toString()
+                                  .isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.grid_view,
+                              Translate.get('section'),
+                              order.seatInfo['section'].toString(),
+                            ),
+                          ],
 
-                        // Section
-                        if (order.seatInfo['section'] != null && 
-                            order.seatInfo['section'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(Icons.grid_view, Translate.get('section'),
-                              order.seatInfo['section'].toString()),
-                        ],
+                          // Stand
+                          if (order.seatInfo['stand'] != null &&
+                              order.seatInfo['stand']
+                                  .toString()
+                                  .isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.stadium,
+                              Translate.get('stand'),
+                              order.seatInfo['stand'].toString(),
+                            ),
+                          ],
 
-                        // Stand
-                        if (order.seatInfo['stand'] != null && 
-                            order.seatInfo['stand'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(Icons.stadium, Translate.get('stand'),
-                              order.seatInfo['stand'].toString()),
-                        ],
-                        
-                        // Floor
-                        if (order.seatInfo['floor'] != null && 
-                            order.seatInfo['floor'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(
-                            Icons.layers, 
-                            Translate.get('floor'),
-                            order.seatInfo['floor'].toString()
-                          ),
-                        ],
+                          // Floor
+                          if (order.seatInfo['floor'] != null &&
+                              order.seatInfo['floor']
+                                  .toString()
+                                  .isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.layers,
+                              Translate.get('floor'),
+                              order.seatInfo['floor'].toString(),
+                            ),
+                          ],
 
-                        // Room
-                        if (order.seatInfo['room'] != null && 
-                            order.seatInfo['room'].toString().isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          _buildDeliveryInfoRow(
-                            Icons.meeting_room, 
-                            Translate.get('room'),
-                            order.seatInfo['room'].toString()
-                          ),
+                          // Room
+                          if (order.seatInfo['room'] != null &&
+                              order.seatInfo['room'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDeliveryInfoRow(
+                              Icons.meeting_room,
+                              Translate.get('room'),
+                              order.seatInfo['room'].toString(),
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
             // Ticket Image Section
-            if (order.seatInfo['ticketImage'] != null && order.seatInfo['ticketImage'].toString().isNotEmpty)
+            if (order.seatInfo['ticketImage'] != null &&
+                order.seatInfo['ticketImage'].toString().isNotEmpty)
               Column(
                 children: [
                   const SizedBox(height: 20),
@@ -274,7 +313,9 @@ class OrderDetailsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: theme.colorScheme.outline.withOpacity(0.3),
+                                color: theme.colorScheme.outline.withOpacity(
+                                  0.3,
+                                ),
                               ),
                             ),
                             child: ClipRRect(
@@ -282,16 +323,25 @@ class OrderDetailsScreen extends StatelessWidget {
                               child: Image.network(
                                 order.seatInfo['ticketImage'],
                                 fit: BoxFit.cover,
-                                loadingBuilder: (context, child, loadingProgress) {
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
                                   if (loadingProgress == null) return child;
                                   return SizedBox(
                                     height: 200,
                                     child: Center(
                                       child: CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
-                                            : null,
+                                        value:
+                                            loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
                                       ),
                                     ),
                                   );
@@ -302,7 +352,8 @@ class OrderDetailsScreen extends StatelessWidget {
                                     color: theme.colorScheme.errorContainer,
                                     child: Center(
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Icon(
                                             Icons.error_outline,
@@ -312,9 +363,11 @@ class OrderDetailsScreen extends StatelessWidget {
                                           const SizedBox(height: 8),
                                           Text(
                                             'Failed to load ticket image',
-                                            style: theme.textTheme.bodyMedium?.copyWith(
-                                              color: theme.colorScheme.error,
-                                            ),
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  color:
+                                                      theme.colorScheme.error,
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -336,8 +389,93 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildPickupDetails(
+    String stadiumId,
+    String pickupPointId,
+    ThemeData theme,
+  ) {
+    return FutureBuilder<DocumentSnapshot>(
+      future:
+          FirebaseFirestore.instance
+              .collection('stadiums')
+              .doc(stadiumId)
+              .collection('pickUpPoints')
+              .doc(pickupPointId)
+              .get(),
+      builder: (context, snapshot) {
+        debugPrint('--- Pickup Point FutureBuilder ---');
+        debugPrint('Connection State: ${snapshot.connectionState}');
+        if (snapshot.hasError) {
+          debugPrint('Error: ${snapshot.error}');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          debugPrint('Document DOES NOT exist or No Data');
+          debugPrint(
+            'Path queried: stadiums/$stadiumId/pickupPoints/$pickupPointId',
+          );
+          return const SizedBox();
+        }
+
+        debugPrint('Document FOUND!');
+        final data = snapshot.data!.data() as Map<String, dynamic>;
+        debugPrint('Data: $data');
+
+        final name = data['name'] ?? '';
+        final location = data['location'] ?? '';
+        final description = data['description'] ?? '';
+
+        return Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  Translate.get('pickupDetails'),
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDeliveryInfoRow(Icons.store, 'Name', name),
+                    const SizedBox(height: 12),
+                    _buildDeliveryInfoRow(
+                      Icons.location_on,
+                      Translate.get('pickupLocation'),
+                      location,
+                    ),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      _buildDeliveryInfoRow(
+                        Icons.info_outline,
+                        Translate.get('pickupInstructions'),
+                        description,
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildStatusIndicator(OrderStatus status, ThemeData theme) {
     final statusColor = _getStatusColor(status);
+    final statusText =
+        (order.deliveryMethod == 'pickup' && status == OrderStatus.delivering)
+            ? Translate.get('readyToPickup')
+            : order.status.toTranslatedString();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -347,14 +485,10 @@ class OrderDetailsScreen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getStatusIcon(status),
-            color: statusColor,
-            size: 20,
-          ),
+          Icon(_getStatusIcon(status), color: statusColor, size: 20),
           const SizedBox(width: 8),
           Text(
-            order.status.toTranslatedString(),
+            statusText,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: statusColor,
               fontWeight: FontWeight.bold,
@@ -426,10 +560,7 @@ class OrderDetailsScreen extends StatelessWidget {
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label),
-              Text(value),
-            ],
+            children: [Text(label), Text(value)],
           ),
         ),
       ],

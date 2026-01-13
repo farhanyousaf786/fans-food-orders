@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fans_food_order/models/order_status.dart';
 import 'package:geolocator/geolocator.dart';
@@ -172,6 +171,8 @@ class DeliveryAssignmentService {
       debugPrint(
         '[assignDeliveryUserBySection] start orderId=$orderId sectionId=$sectionId',
       );
+
+      // Step 1: Get all eligible delivery users
       final eligibleUsers =
           await _firestore
               .collection('deliveryUsers')
@@ -191,25 +192,59 @@ class DeliveryAssignmentService {
         return null;
       }
 
-      final docs = eligibleUsers.docs;
-      final deliveryUserId = docs[Random().nextInt(docs.length)].id;
-      debugPrint(
-        '[assignDeliveryUserBySection] selected deliveryUserId=$deliveryUserId',
-      );
+      // Step 2: Find the least busy delivery user
+      String? leastBusyUserId;
+      int minActiveOrders = 999999;
+
+      for (var doc in eligibleUsers.docs) {
+        final userId = doc.id;
+
+        // Count how many "delivering" orders this user currently has
+        final activeOrdersSnapshot =
+            await _firestore
+                .collection('orders')
+                .where('deliveryUserId', isEqualTo: userId)
+                .where('status', isEqualTo: OrderStatus.delivering.index)
+                .count()
+                .get();
+
+        final activeCount = activeOrdersSnapshot.count ?? 0;
+
+        debugPrint(
+          '[assignDeliveryUserBySection] userId=$userId has $activeCount active deliveries',
+        );
+
+        // Track the user with fewest active orders
+        if (activeCount < minActiveOrders) {
+          minActiveOrders = activeCount;
+          leastBusyUserId = userId;
+        }
+      }
+
+      if (leastBusyUserId == null) {
+        debugPrint('[assignDeliveryUserBySection] no suitable user found');
+        return null;
+      }
 
       debugPrint(
-        '[assignDeliveryUserBySection] updating order $orderId with deliveryUserId',
+        '[assignDeliveryUserBySection] selected LEAST BUSY user: $leastBusyUserId with $minActiveOrders active orders',
+      );
+
+      // Step 3: Assign the order to the least busy user
+      debugPrint(
+        '[assignDeliveryUserBySection] updating order $orderId with deliveryUserId=$leastBusyUserId',
       );
       await _firestore.collection('orders').doc(orderId).update({
-        'deliveryUserId': deliveryUserId,
+        'deliveryUserId': leastBusyUserId,
         'status': OrderStatus.delivering.index,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
       debugPrint(
-        '[assignDeliveryUserBySection] order $orderId updated successfully',
+        '[assignDeliveryUserBySection] order $orderId assigned successfully to $leastBusyUserId',
       );
 
-      return deliveryUserId;
+      return leastBusyUserId;
     } catch (e) {
       debugPrint('[assignDeliveryUserBySection] error: $e');
       return null;
@@ -222,8 +257,10 @@ class DeliveryAssignmentService {
   }) async {
     try {
       debugPrint(
-        '[assignDeliveryUserBySection] start orderId=$orderId shopId=$shopId',
+        '[assignDeliveryUserByShop] start orderId=$orderId shopId=$shopId',
       );
+
+      // Step 1: Get all eligible delivery users
       final eligibleUsers =
           await _firestore
               .collection('deliveryUsers')
@@ -233,37 +270,71 @@ class DeliveryAssignmentService {
               .get();
 
       debugPrint(
-        '[assignDeliveryUserBySection] eligible users found: ${eligibleUsers.docs.length}',
+        '[assignDeliveryUserByShop] eligible users found: ${eligibleUsers.docs.length}',
       );
 
       if (eligibleUsers.docs.isEmpty) {
         debugPrint(
-          '[assignDeliveryUserBySection] no eligible users for shopId=$shopId',
+          '[assignDeliveryUserByShop] no eligible users for shopId=$shopId',
         );
         return null;
       }
 
-      final docs = eligibleUsers.docs;
-      final deliveryUserId = docs[Random().nextInt(docs.length)].id;
-      debugPrint(
-        '[assignDeliveryUserBySection] selected deliveryUserId=$deliveryUserId',
-      );
+      // Step 2: Find the least busy delivery user
+      String? leastBusyUserId;
+      int minActiveOrders = 999999;
+
+      for (var doc in eligibleUsers.docs) {
+        final userId = doc.id;
+
+        // Count how many "delivering" orders this user currently has
+        final activeOrdersSnapshot =
+            await _firestore
+                .collection('orders')
+                .where('deliveryUserId', isEqualTo: userId)
+                .where('status', isEqualTo: OrderStatus.delivering.index)
+                .count()
+                .get();
+
+        final activeCount = activeOrdersSnapshot.count ?? 0;
+
+        debugPrint(
+          '[assignDeliveryUserByShop] userId=$userId has $activeCount active deliveries',
+        );
+
+        // Track the user with fewest active orders
+        if (activeCount < minActiveOrders) {
+          minActiveOrders = activeCount;
+          leastBusyUserId = userId;
+        }
+      }
+
+      if (leastBusyUserId == null) {
+        debugPrint('[assignDeliveryUserByShop] no suitable user found');
+        return null;
+      }
 
       debugPrint(
-        '[assignDeliveryUserBySection] updating order $orderId with deliveryUserId',
+        '[assignDeliveryUserByShop] selected LEAST BUSY user: $leastBusyUserId with $minActiveOrders active orders',
+      );
+
+      // Step 3: Assign the order to the least busy user
+      debugPrint(
+        '[assignDeliveryUserByShop] updating order $orderId with deliveryUserId=$leastBusyUserId',
       );
       await _firestore.collection('orders').doc(orderId).update({
-        'deliveryUserId': deliveryUserId,
+        'deliveryUserId': leastBusyUserId,
         'status': OrderStatus.delivering.index,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
       debugPrint(
-        '[assignDeliveryUserBySection] order $orderId updated successfully',
+        '[assignDeliveryUserByShop] order $orderId assigned successfully to $leastBusyUserId',
       );
 
-      return deliveryUserId;
+      return leastBusyUserId;
     } catch (e) {
-      debugPrint('[assignDeliveryUserBySection] error: $e');
+      debugPrint('[assignDeliveryUserByShop] error: $e');
       return null;
     }
   }
