@@ -267,8 +267,16 @@ class OrderDetailsScreen extends StatelessWidget {
                 Translate.get('outside_delivery'),
                 order.outsideDelivery!,
                 theme,
-              )
-            else
+              ),
+
+            // Show Delivery Information (Seat, Row, Room, etc) for all delivery types
+            if (order.deliveryMethod != 'pickup' &&
+                order.seatInfo.entries.any(
+                  (e) =>
+                      e.key != 'ticketImage' &&
+                      e.value != null &&
+                      e.value.toString().isNotEmpty,
+                ))
               Card(
                 color: Colors.white,
                 child: Padding(
@@ -655,7 +663,10 @@ class OrderDetailsScreen extends StatelessWidget {
     Map<String, dynamic> deliveryData,
     ThemeData theme,
   ) {
-    final locationData = deliveryData['location'] as Map<String, dynamic>?;
+    final locationData =
+        deliveryData['location'] is Map
+            ? deliveryData['location'] as Map<String, dynamic>
+            : null;
 
     return Card(
       color: Colors.white,
@@ -681,18 +692,50 @@ class OrderDetailsScreen extends StatelessWidget {
                     'Description',
                     locationData['description'].toString(),
                   ),
+
+                // Added Section, Row, Seat, Floor, Room for Inside Delivery
+                if (deliveryData['section'] != null &&
+                    deliveryData['section'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.grid_view,
+                    Translate.get('section'),
+                    deliveryData['section'].toString(),
+                  ),
+                if (deliveryData['row'] != null &&
+                    deliveryData['row'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.view_stream,
+                    Translate.get('row'),
+                    deliveryData['row'].toString(),
+                  ),
+                if (deliveryData['seatNo'] != null &&
+                    deliveryData['seatNo'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.event_seat,
+                    Translate.get('seat_no'),
+                    deliveryData['seatNo'].toString(),
+                  ),
+                if (deliveryData['floor'] != null &&
+                    deliveryData['floor'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.layers,
+                    Translate.get('floor'),
+                    deliveryData['floor'].toString(),
+                  ),
+                if (deliveryData['room'] != null &&
+                    deliveryData['room'].toString().isNotEmpty)
+                  _buildDeliveryInfoRow(
+                    Icons.meeting_room,
+                    Translate.get('room'),
+                    deliveryData['room'].toString(),
+                  ),
+
                 if (deliveryData['notes'] != null &&
                     deliveryData['notes'].toString().isNotEmpty)
                   _buildDeliveryInfoRow(
                     Icons.note,
                     'Notes',
                     deliveryData['notes'].toString(),
-                  ),
-                if (deliveryData['fee'] != null)
-                  _buildDeliveryInfoRow(
-                    Icons.attach_money,
-                    'Extra Fee',
-                    '${deliveryData['currency'] ?? ''} ${deliveryData['fee']}',
                   ),
               ],
             ),

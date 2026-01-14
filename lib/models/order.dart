@@ -83,14 +83,20 @@ class OrderModel extends Equatable {
       total: (map['total'] ?? 0) * 1.0,
       tipAmount: (map['tipAmount'] ?? 0) * 1.0,
       isTipAdded: map['isTipAdded'] ?? false,
-      userInfo: map['userInfo'] ?? {},
+      userInfo:
+          map['userInfo'] is Map
+              ? Map<String, dynamic>.from(map['userInfo'])
+              : {},
       stadiumId: map['stadiumId'] ?? '',
       shopId: map['shopId'] ?? '',
       orderId: map['orderId'] ?? '',
       status: OrderStatus.values[map['status'] ?? 0],
       createdAt: map['createdAt'] as Timestamp?,
       deliveryTime: map['deliveryTime'] as Timestamp?,
-      seatInfo: map['seatInfo'] ?? {},
+      seatInfo:
+          map['seatInfo'] is Map
+              ? Map<String, dynamic>.from(map['seatInfo'])
+              : {},
       deliveryUserId: map['deliveryUserId'],
       orderCode: map['orderCode'] ?? '',
       location: map['location'] as GeoPoint?,
@@ -102,8 +108,14 @@ class OrderModel extends Equatable {
       updatedAt: map['updatedAt'] as Timestamp?,
       platform: map['platform'] ?? 'App',
       deliveryType: map['deliveryType'] ?? '',
-      insideDelivery: map['insideDelivery'] as Map<String, dynamic>?,
-      outsideDelivery: map['outsideDelivery'] as Map<String, dynamic>?,
+      insideDelivery:
+          map['insideDelivery'] is Map
+              ? Map<String, dynamic>.from(map['insideDelivery'])
+              : null,
+      outsideDelivery:
+          map['outsideDelivery'] is Map
+              ? Map<String, dynamic>.from(map['outsideDelivery'])
+              : null,
     );
   }
 
