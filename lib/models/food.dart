@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
-
-
 // ignore: must_be_immutable
 class Food extends Equatable {
   final String id;
@@ -29,6 +27,7 @@ class Food extends Equatable {
   final List<Map<String, dynamic>> toppings;
   final DateTime updatedAt;
   final Map<String, bool> foodType;
+  final List<Map<String, dynamic>> selectedOptions;
 
   int quantity = 1;
 
@@ -57,67 +56,82 @@ class Food extends Equatable {
     required this.toppings,
     required this.updatedAt,
     required this.foodType,
+    this.selectedOptions = const [],
     this.quantity = 1,
   });
 
   factory Food.fromMap(String id, Map<String, dynamic> map) {
     return Food(
       id: id,
-      allergens: (map['allergens'] as List<dynamic>?)
+      allergens:
+          (map['allergens'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       category: map['category'] ?? '',
       currency: map['currency'] ?? '',
-      categoryMap: (map['categoryMap'] as Map<String, dynamic>?)
-              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+      categoryMap:
+          (map['categoryMap'] as Map<String, dynamic>?)?.map(
+            (key, value) => MapEntry(key, value?.toString() ?? ''),
+          ) ??
           {},
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       customization: (map['customization'] as Map<String, dynamic>?) ?? {},
       description: map['description'] ?? '',
-      descriptionMap: (map['descriptionMap'] as Map<String, dynamic>?)
-              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+      descriptionMap:
+          (map['descriptionMap'] as Map<String, dynamic>?)?.map(
+            (key, value) => MapEntry(key, value?.toString() ?? ''),
+          ) ??
           {},
-      extras: (map['extras'] as List<dynamic>?)
+      extras:
+          (map['extras'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
-      images: (map['images'] as List<dynamic>?)
+      images:
+          (map['images'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       isAvailable: map['isAvailable'] ?? true,
       name: map['name'] ?? '',
-      nameMap: (map['nameMap'] as Map<String, dynamic>?)
-              ?.map((key, value) => MapEntry(key, value?.toString() ?? '')) ??
+      nameMap:
+          (map['nameMap'] as Map<String, dynamic>?)?.map(
+            (key, value) => MapEntry(key, value?.toString() ?? ''),
+          ) ??
           {},
       nutritionalInfo: (map['nutritionalInfo'] as Map<String, dynamic>?) ?? {},
       preparationTime: map['preparationTime'] ?? 15,
       price: (map['price'] ?? 0).toDouble(),
-      sauces: (map['sauces'] as List<dynamic>?)
+      sauces:
+          (map['sauces'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
       shopIds: List<String>.from(map['shopIds'] ?? []),
       stadiumId: map['stadiumId'] ?? '',
-      sizes: (map['sizes'] as List<dynamic>?)
+      sizes:
+          (map['sizes'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
-      toppings: (map['toppings'] as List<dynamic>?)
+      toppings:
+          (map['toppings'] as List<dynamic>?)
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
       updatedAt: (map['updatedAt'] as Timestamp).toDate(),
-      foodType: (map['foodType'] as Map<String, dynamic>?)?.map(
+      foodType:
+          (map['foodType'] as Map<String, dynamic>?)?.map(
             (key, value) => MapEntry(key, value as bool),
           ) ??
-          {
-            'halal': false,
-            'kosher': false,
-            'vegan': false,
-          },
+          {'halal': false, 'kosher': false, 'vegan': false},
       quantity: map['quantity'] ?? 0,
+      selectedOptions:
+          (map['selectedOptions'] as List<dynamic>?)
+              ?.map((x) => Map<String, dynamic>.from(x))
+              .toList() ??
+          [],
     );
   }
 
@@ -145,28 +159,27 @@ class Food extends Equatable {
       'toppings': toppings,
       'updatedAt': updatedAt,
       'foodType': foodType,
+      'selectedOptions': selectedOptions,
     };
   }
-
-
 
   // Localization helpers
   String nameFor(String languageCode) {
     final value = nameMap[languageCode];
     // if (value != null && value.trim().isNotEmpty) return value;
-    return value ??'';
+    return value ?? '';
   }
 
   String descriptionFor(String languageCode) {
     final value = descriptionMap[languageCode];
     // if (value != null && value.trim().isNotEmpty) return value;
-    return value ??'';
+    return value ?? '';
   }
 
   String categoryFor(String languageCode) {
     final value = categoryMap[languageCode];
     // if (value != null && value.trim().isNotEmpty) return value;
-    return value??'';
+    return value ?? '';
   }
 
   @override

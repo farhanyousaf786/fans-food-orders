@@ -85,10 +85,30 @@ class OrderDetailsScreen extends StatelessWidget {
                               ),
                             ),
                     title: Text(item.nameFor(lang)),
-                    subtitle: Text(
-                      item.descriptionFor(lang),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (item.descriptionFor(lang).isNotEmpty)
+                          Text(
+                            item.descriptionFor(lang),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        if (item.selectedOptions.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          ...item.selectedOptions.map((opt) {
+                            final name = opt['name'] ?? '';
+                            // final price = (opt['price'] ?? 0);
+                            return Text(
+                              name, // Just show name, no price
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
                     ),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
