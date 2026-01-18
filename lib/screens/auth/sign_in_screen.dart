@@ -29,13 +29,19 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _handleSignIn(AuthProvider auth) async {
-    String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    print("APNS Token: $apnsToken");
+    // Try to get FCM token, but don't block sign-in if it fails
+    try {
+      String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      print("APNS Token: $apnsToken");
 
-    print("FCM Token>>>>>>>>");
-    await Future.delayed(Duration(seconds: 1));
-    String? token = await FirebaseMessaging.instance.getToken();
-    print("FCM Token: $token");
+      print("FCM Token>>>>>>>>");
+      await Future.delayed(Duration(seconds: 1));
+      String? token = await FirebaseMessaging.instance.getToken();
+      print("FCM Token: $token");
+    } catch (e) {
+      print("Failed to get FCM token: $e");
+      // Continue with sign-in even if FCM token retrieval fails
+    }
 
     if (_formKey.currentState?.validate() ?? false) {
       try {
@@ -44,9 +50,11 @@ class _SignInScreenState extends State<SignInScreen> {
           _passwordController.text,
         );
         // Clear error message if login successful
-        setState(() {
-          _errorMessage = null;
-        });
+        if (mounted) {
+          setState(() {
+            _errorMessage = null;
+          });
+        }
 
         // Navigate to home screen after successful login
         if (mounted && auth.isAuthenticated) {
@@ -55,9 +63,11 @@ class _SignInScreenState extends State<SignInScreen> {
           );
         }
       } catch (e) {
-        setState(() {
-          _errorMessage = e.toString();
-        });
+        if (mounted) {
+          setState(() {
+            _errorMessage = e.toString();
+          });
+        }
       }
     }
   }
