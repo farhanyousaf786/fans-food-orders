@@ -10,6 +10,7 @@ class AppTranslations {
     'en': {
       'continueShopping': 'Continue Shopping',
       'goToCheckout': 'Proceed To Checkout',
+      'standardPreparation': 'Standard Preparation',
 
       'entranceLabel': 'Entrance',
       'entranceHint': 'Enter entrance number/name',
@@ -719,6 +720,7 @@ class AppTranslations {
     'he': {
       'continueShopping': 'המשך קנייה',
       'goToCheckout': 'לתשלום',
+      'standardPreparation': 'הכנה רגילה',
 
       'feedbackUs': 'מָשׁוֹב',
       'signInWelcome': 'ברוך שובך!',

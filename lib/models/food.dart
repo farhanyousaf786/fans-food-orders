@@ -28,6 +28,7 @@ class Food extends Equatable {
   final DateTime updatedAt;
   final Map<String, bool> foodType;
   final List<Map<String, dynamic>> selectedOptions;
+  final List<Map<String, dynamic>> comboSelectedOption;
 
   int quantity = 1;
 
@@ -57,6 +58,7 @@ class Food extends Equatable {
     required this.updatedAt,
     required this.foodType,
     this.selectedOptions = const [],
+    this.comboSelectedOption = const [],
     this.quantity = 1,
   });
 
@@ -132,6 +134,11 @@ class Food extends Equatable {
               ?.map((x) => Map<String, dynamic>.from(x))
               .toList() ??
           [],
+      comboSelectedOption:
+          (map['comboSelectedOption'] as List<dynamic>?)
+              ?.map((x) => Map<String, dynamic>.from(x))
+              .toList() ??
+          [],
     );
   }
 
@@ -160,6 +167,7 @@ class Food extends Equatable {
       'updatedAt': updatedAt,
       'foodType': foodType,
       'selectedOptions': selectedOptions,
+      'comboSelectedOption': comboSelectedOption,
     };
   }
 

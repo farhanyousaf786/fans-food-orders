@@ -1,4 +1,5 @@
 import 'package:fans_food_order/models/order.dart';
+import 'package:fans_food_order/translations/translate.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -71,22 +72,40 @@ class ReceiptService {
               ),
               pw.SizedBox(height: 5),
               ...order.cart.map((item) {
-                final selectedOptions =
-                    item.selectedOptions.isNotEmpty
-                        ? item.selectedOptions
-                            .map((o) => ' - ${o['name']}')
-                            .join('\n')
-                        : '';
+                String optionsText = '';
+
+                if (item.comboSelectedOption.isNotEmpty) {
+                  // If comboSelectedOption exists, show combo items and their options
+                  optionsText = item.comboSelectedOption
+                      .map((comboItem) {
+                        final itemName = comboItem['itemName'] ?? '';
+                        final options =
+                            (comboItem['options'] as List<dynamic>?)
+                                ?.map((o) => '   * ${o['name']}')
+                                .join('\n') ??
+                            '';
+                        return ' - $itemName${options.isNotEmpty ? '\n$options' : ''}';
+                      })
+                      .join('\n');
+                } else if (item.selectedOptions.isNotEmpty) {
+                  // Fallback to standard selectedOptions
+                  optionsText = item.selectedOptions
+                      .map((o) => ' - ${o['name']}')
+                      .join('\n');
+                } else {
+                  // NEW: Standard Preparation if no options
+                  optionsText = ' - ${Translate.get('standardPreparation')}';
+                }
 
                 return pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text('${item.quantity}x ${item.nameFor('en')}'),
-                    if (selectedOptions.isNotEmpty)
+                    if (optionsText.isNotEmpty)
                       pw.Padding(
                         padding: const pw.EdgeInsets.only(left: 10),
                         child: pw.Text(
-                          selectedOptions,
+                          optionsText,
                           style: const pw.TextStyle(
                             fontSize: 10,
                             color: PdfColors.grey700,

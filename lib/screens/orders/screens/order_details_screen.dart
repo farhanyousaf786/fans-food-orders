@@ -104,19 +104,84 @@ class OrderDetailsScreen extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        if (item.selectedOptions.isNotEmpty) ...[
+                        if (item.comboSelectedOption.isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          ...item.selectedOptions.map((opt) {
-                            final name = opt['name'] ?? '';
-                            // final price = (opt['price'] ?? 0);
-                            return Text(
-                              name, // Just show name, no price
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                          ...item.comboSelectedOption.map((comboItem) {
+                            final itemName = comboItem['itemName'] ?? '';
+                            final optionsList =
+                                (comboItem['options'] as List<dynamic>?)
+                                    ?.map((o) => o['name']?.toString() ?? '')
+                                    .where((n) => n.isNotEmpty)
+                                    .toList() ??
+                                [];
+
+                            final hasOptions = optionsList.isNotEmpty;
+                            final optionsStr =
+                                hasOptions
+                                    ? optionsList.join(', ')
+                                    : Translate.get('standardPreparation');
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '$itemName: ',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: Colors.blue,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    TextSpan(
+                                      text: optionsStr,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color:
+                                                hasOptions
+                                                    ? Colors.grey[800]
+                                                    : Colors.grey[500],
+                                            fontSize: hasOptions ? 12 : 10,
+                                            fontWeight:
+                                                hasOptions
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
+                                            fontStyle:
+                                                hasOptions
+                                                    ? FontStyle.normal
+                                                    : FontStyle.italic,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           }),
+                        ] else if (item.selectedOptions.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          ...item.selectedOptions.map((opt) {
+                            final name = opt['name'] ?? '';
+                            return Text(
+                              name,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[800],
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }),
+                        ] else ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            Translate.get('standardPreparation'),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[500],
+                              fontSize: 10,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ],
                       ],
                     ),

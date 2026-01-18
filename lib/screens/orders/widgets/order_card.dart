@@ -9,8 +9,6 @@ import '../../../widgets/app_colors.dart';
 import '../screens/order_details_screen.dart';
 import '../../../utils/currency_helper.dart';
 
-import '../../../translations/language_service.dart';
-
 class OrderCard extends StatelessWidget {
   final OrderModel order;
   final VoidCallback? onStatusUpdated;
@@ -20,7 +18,6 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final lang = LanguageService.getCurrentLanguage();
 
     return Card(
       color: Colors.white,
@@ -144,39 +141,7 @@ class OrderCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (order.cart.any((item) => item.selectedOptions.isNotEmpty)) ...[
-              const SizedBox(height: 8),
-              ...order.cart
-                  .where((item) => item.selectedOptions.isNotEmpty)
-                  .map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.nameFor(lang),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          ...item.selectedOptions.map(
-                            (opt) => Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                '• ${opt['name'] ?? ''}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[800],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-            ],
+
             if (order.seatInfo.isNotEmpty) ...[
               const SizedBox(height: 8),
               Row(
