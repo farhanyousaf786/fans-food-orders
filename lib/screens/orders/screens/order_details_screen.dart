@@ -14,6 +14,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../utils/custom_text_style.dart';
 
+import '../../../services/receipt_service.dart';
+
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
 
@@ -39,6 +41,14 @@ class OrderDetailsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.print),
+            onPressed: () {
+              ReceiptService().printReceipt(order);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
