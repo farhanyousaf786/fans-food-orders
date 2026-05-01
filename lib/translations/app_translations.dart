@@ -11,6 +11,8 @@ class AppTranslations {
       'continueShopping': 'Continue Shopping',
       'goToCheckout': 'Proceed To Checkout',
       'standardPreparation': 'Standard Preparation',
+      'locationName': 'Location Name',
+      'notes': 'Notes',
 
       'entranceLabel': 'Entrance',
       'entranceHint': 'Enter entrance number/name',
@@ -721,6 +723,8 @@ class AppTranslations {
       'continueShopping': 'המשך קנייה',
       'goToCheckout': 'לתשלום',
       'standardPreparation': 'הכנה רגילה',
+      'locationName': 'שם המיקום',
+      'notes': 'הערות',
 
       'feedbackUs': 'מָשׁוֹב',
       'signInWelcome': 'ברוך שובך!',

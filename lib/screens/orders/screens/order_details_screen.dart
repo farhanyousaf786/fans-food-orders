@@ -765,73 +765,130 @@ class OrderDetailsScreen extends StatelessWidget {
 
     return Card(
       color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(
+                  deliveryData == order.insideDelivery
+                      ? Icons.meeting_room
+                      : Icons.location_on,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (locationData != null && locationData['name'] != null)
                   _buildDeliveryInfoRow(
-                    Icons.location_on,
-                    'Location Name',
+                    Icons.business,
+                    Translate.get('locationName'),
                     locationData['name'].toString(),
                   ),
-                if (locationData != null && locationData['description'] != null)
+                if (locationData != null &&
+                    locationData['description'] != null) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.description,
-                    'Description',
+                    Translate.get('description'),
                     locationData['description'].toString(),
                   ),
+                ],
 
                 // Added Section, Row, Seat, Floor, Room for Inside Delivery
                 if (deliveryData['section'] != null &&
-                    deliveryData['section'].toString().isNotEmpty)
+                    deliveryData['section'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.grid_view,
                     Translate.get('section'),
                     deliveryData['section'].toString(),
                   ),
+                ],
                 if (deliveryData['row'] != null &&
-                    deliveryData['row'].toString().isNotEmpty)
+                    deliveryData['row'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.view_stream,
                     Translate.get('row'),
                     deliveryData['row'].toString(),
                   ),
+                ],
                 if (deliveryData['seatNo'] != null &&
-                    deliveryData['seatNo'].toString().isNotEmpty)
+                    deliveryData['seatNo'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.event_seat,
                     Translate.get('seat_no'),
                     deliveryData['seatNo'].toString(),
                   ),
+                ],
                 if (deliveryData['floor'] != null &&
-                    deliveryData['floor'].toString().isNotEmpty)
+                    deliveryData['floor'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.layers,
                     Translate.get('floor'),
                     deliveryData['floor'].toString(),
                   ),
+                ],
                 if (deliveryData['room'] != null &&
-                    deliveryData['room'].toString().isNotEmpty)
+                    deliveryData['room'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   _buildDeliveryInfoRow(
                     Icons.meeting_room,
                     Translate.get('room'),
                     deliveryData['room'].toString(),
                   ),
+                ],
 
                 if (deliveryData['notes'] != null &&
-                    deliveryData['notes'].toString().isNotEmpty)
-                  _buildDeliveryInfoRow(
-                    Icons.note,
-                    'Notes',
-                    deliveryData['notes'].toString(),
+                    deliveryData['notes'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.note, size: 20, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              Translate.get('notes'),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              deliveryData['notes'].toString(),
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                ],
               ],
             ),
           ],
