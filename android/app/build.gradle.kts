@@ -35,7 +35,7 @@ android {
         applicationId = "com.fanmunch.fansfoodorder"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 111
+        versionCode = 114
         versionName = flutter.versionName
     }
 
